@@ -19,8 +19,8 @@ jobs:
     - name: Run tests within the API container
       run: |
         docker compose up -d
-        docker exec -i api-container python test.py <<< "y" > python-test-results.txt
-        docker cp api-container:/api/python-test-results.txt python-test-results.txt
+        docker exec -i backend-container python test.py <<< "y" > python-test-results.txt
+        docker cp backend-container:/api/python-test-results.txt python-test-results.txt
 
     # Upload test results as an artifact
     - name: Upload test results
