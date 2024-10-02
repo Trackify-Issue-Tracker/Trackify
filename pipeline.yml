@@ -1,0 +1,82 @@
+# Build angular app and push it to the trackify-live-static-website repo so that github pages and display the app
+# Create an in-memory database and have the angular app use that through setting environmental variables
+# thus the containers won't be used for the live app since github pages only allows static webpages
+# To use the containers, you must have docker installed and run the compose file locally. Then you can access
+# the app using localhost:5000, which will then use the python container api and the postgres container database.
+
+# Test api using ./api/test.py but needs to be run in the docker compose container for api
+# Test index.html
+
+# Status checks:
+# javascript linter
+# python linter
+# api tests
+
+name: Build and Push Angular web app to trackify-live-app repo
+on:
+  push:
+    branches: [ main ]
+
+env:
+  API_SETTING: 'local'
+
+jobs:
+  build-and-push:
+    name: Build Project and Push to repo
+    runs-on: ubuntu-latest
+
+    steps:
+      # Build and push the Angular app
+      - name: Build Angular app
+        run: |
+          cd app
+          npm install
+          ng build --prod
+      - name: Upload Angular app
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: ./app/dist
+      - name: Push Angular app to repo
+        run: |
+          curl -o dist.zip https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/artifacts/$(curl -s https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/runs/${GITHUB_RUN_ID}/artifacts | jq -r '.artifacts[] | select(.name == "dist") | .archive_download_url')
+          unzip dist.zip -d ./dist
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Deploy Angular app"
+          git push https://Trackify-Issue-Tracker:${GITHUB_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Run tests within the API container
+      - name: Run tests within the API container
+        run: |
+          docker-compose up -d
+          docker exec -i api-container python test.py <<< "y"
+
+      # Get the test results
+      - name: Get test results
+        run: |
+          docker cp api-container:/app/test-results.xml .
+
+      # Upload test results as artifact
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: test-results.xml
+
+      # Comment on PR if there's an error
+      - name: Comment on PR
+        if: contains(github.workspace/test-results.xml, 'FAIL')
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.createComment({
+              issue_number: github.context.pullRequest.number,
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
+              body: 'API Test failed! Please check the test results.'
+            })
