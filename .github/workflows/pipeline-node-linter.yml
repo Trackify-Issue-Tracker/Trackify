@@ -1,0 +1,26 @@
+name: Angular/Node/JS Linter
+
+on:
+  pull_request:
+    branches:
+      - main
+      - nonprod
+
+jobs:
+  lint-js:
+    name: Lint Angular App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          cd app
+          npm install
+
+      - name: Lint Angular app
+        run: |
+          cd app
+          ng lint
