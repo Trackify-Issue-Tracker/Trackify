@@ -1,4 +1,4 @@
-name: Python Linting
+name: Python Linter
 
 # On PR to main or nonprod
 on:

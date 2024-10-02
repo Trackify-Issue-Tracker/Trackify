@@ -1,4 +1,4 @@
-name: Python Lint
+name: Python Tester
 
 # On PR to main or nonprod
 on:
@@ -18,7 +18,7 @@ jobs:
     # Run tests within the API container
     - name: Run tests within the API container
       run: |
-        docker-compose up -d
+        docker compose up -d
         docker exec -i api-container python test.py <<< "y" > python-test-results.txt
         docker cp api-container:/api/python-test-results.txt python-test-results.txt
 
