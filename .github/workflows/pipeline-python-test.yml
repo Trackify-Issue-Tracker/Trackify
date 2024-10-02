@@ -1,0 +1,36 @@
+name: Python Lint
+
+# On PR to main or nonprod
+on:
+  pull_request:
+    branches:
+      - main
+      - nonprod
+
+jobs:
+  python-test:
+    name: Test the Python API
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Run tests within the API container
+    - name: Run tests within the API container
+      run: |
+        docker-compose up -d
+        docker exec -i api-container python test.py <<< "y" > test-results.txt
+        docker cp api-container:/api/test-results.txt test-results.txt
+
+    - name: Comment on PR if there's an error
+      if: "!contains(github.workspace/test-results.txt, 'OK')"
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.issues.createComment({
+            issue_number: github.context.pullRequest.number,
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            body: 'Testing failed! Please check the test results below:\n\n```${{github.workspace/test-results.txt}}```'
+          })

@@ -1,0 +1,33 @@
+name: Python Linting
+
+# On PR to main or nonprod
+on:
+  pull_request:
+    branches:
+      - main
+      - nonprod
+
+jobs:
+  python-lint:
+    name: Lint the Python API and tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.12
+
+    - name: Install dependencies
+      run: |
+        cd api
+        python -m pip install --upgrade pip
+        pip install pylint
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Analysing the code with pylint
+      run: |
+        cd api
+        pylint $(git ls-files '*.py')
