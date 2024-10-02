@@ -23,7 +23,7 @@ jobs:
         docker cp api-container:/api/test-results.txt test-results.txt
 
     - name: Comment on PR if there's an error
-      if: "!contains(github.workspace/test-results.txt, 'OK')"
+      if: "!contains(readfile('test-results.txt'), 'OK')"
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
