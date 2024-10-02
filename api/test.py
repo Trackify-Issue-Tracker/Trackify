@@ -3,11 +3,13 @@ test.py
 
 This test suite covers the following endpoints:
     Root endpoint (/)
+    Reset endpoint (/reset)
     Get all projects (/projects)
     Create project (/projects)
     Get project by ID (/projects/{id})
     Update project (/projects/{id})
     Delete project (/projects/{id})
+    Get issues by project (/projects/{id}/issues)
     Get all issues (/issues)
     Create issue (/issues)
     Get issue by ID (/issues/{id})
@@ -62,7 +64,9 @@ class TestAPI(unittest.TestCase):
         response = self.app.get("/")
         # Test
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {"message": "Trackify API says hello!"})
+        self.assertEqual(
+            response.json, {"message": "Trackify API says hello!"}, response.json
+        )
 
     def test_create_project(self):
         """
