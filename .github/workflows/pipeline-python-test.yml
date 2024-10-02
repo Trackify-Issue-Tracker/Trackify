@@ -28,9 +28,11 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
+          const fs = require('fs');
+          const testResults = fs.readFileSync('test-results.txt', 'utf8');
           github.issues.createComment({
             issue_number: github.context.pullRequest.number,
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
-            body: 'Testing failed! Please check the test results below:\n\n```${{github.workspace/test-results.txt}}```'
-          })
+            body: 'Testing failed! Please check the test results below:\n\n```${testResults}```'
+          });
