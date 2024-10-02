@@ -15,6 +15,8 @@ This test suite covers the following endpoints:
     Delete issue (/issues/{id})
 """
 
+# pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-public-methods, no-else-return, no-else-break
+
 import unittest
 import json
 from api import app
@@ -425,7 +427,6 @@ class TestAPI(unittest.TestCase):
 
 if __name__ == "__main__":
     print("WARNING: All data in the database will be deleted")
-    # pylint: disable=invalid-name
     input_val = ""
     while input_val not in ["y", "n"]:
         input_val = input("Are you sure you want to continue? (Y/n) ")

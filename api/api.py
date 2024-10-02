@@ -23,6 +23,8 @@ API Endpoints:
 /reset - DELETE all data in the database
 """
 
+# pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-return-statements, no-else-return, no-else-break
+
 import os
 import psycopg2
 from flask import Flask, jsonify, request
