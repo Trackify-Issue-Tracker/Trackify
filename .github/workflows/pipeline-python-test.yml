@@ -15,8 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Run tests within the API container
-    - name: Run tests within the API container
+    - name: Build and run the app's containers
       run: |
         docker compose up -d
+    
+    - name: Test the Python API
+      run: |
         docker compose exec backend-container python test.py <<< "y"
