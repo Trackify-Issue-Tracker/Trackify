@@ -12,36 +12,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Restore cached dependencies 
-        id: cache-restore 
-        uses: actions/cache@v3 
-        with: 
-          path: ./app/node_modules 
-          key: npm-${{ hashFiles('./app/package-lock.json') }} 
-        
-      - name: Install dependencies 
-        if: steps.cache-restore.outputs.cache-hit != 'true' 
-        run: | 
-          cd app 
-          npm ci - ignore-scripts 
-        
-      - name: Lint 
-        run: | 
-          cd app 
-          npm run lint
+    # - name: Restore cached dependencies 
+    #   id: cache-restore 
+    #   uses: actions/cache@v3 
+    #   with: 
+    #     path: ./app/node_modules 
+    #     key: npm-${{ hashFiles('./app/package-lock.json') }} 
+      
+    # - name: Install dependencies 
+    #   if: steps.cache-restore.outputs.cache-hit != 'true' 
+    #   run: | 
+    #     cd app 
+    #     npm ci - ignore-scripts 
+      
+    # - name: Lint 
+    #   run: | 
+    #     cd app 
+    #     npm run lint -- --fix
 
+    - name: Setup Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
 
-      # - name: Install dependencies
-      #   run: |
-      #     cd app
-      #     npm install
-      #     npm install -g @angular/cli@17 > /dev/null 
-      #     ng add @angular-eslint/schematics
+    - name: Install dependencies
+      run: |
+        cd app
+        npm install
+        npm install -g @angular/cli@17 > /dev/null 
+        ng add @angular-eslint/schematics
 
-      # - name: Lint Angular app
-      #   run: |
-      #     cd app
-      #     ng lint
+    - name: Lint Angular app
+      run: |
+        cd app
+        ng lint

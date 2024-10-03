@@ -36,25 +36,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Build and push the Angular app
-      - name: Build Angular app
-        run: |
-          cd app
-          npm install
-          ng build --prod
-      - name: Upload Angular app
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: ./app/dist
-      - name: Push Angular app to repo
-        run: |
-          curl -o dist.zip https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/artifacts/$(curl -s https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/runs/${GITHUB_RUN_ID}/artifacts | jq -r '.artifacts[] | select(.name == "dist") | .archive_download_url')
-          unzip dist.zip -d ./dist
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "Deploy Angular app"
-          git push https://Trackify-Issue-Tracker:${GITHUB_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Build and push the Angular app
+    - name: Build Angular app
+      run: |
+        cd app
+        npm install
+        ng build --prod
+
+    - name: Upload Angular app
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: ./app/dist
+        
+    - name: Push Angular app to repo
+      run: |
+        curl -o dist.zip https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/artifacts/$(curl -s https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/runs/${GITHUB_RUN_ID}/artifacts | jq -r '.artifacts[] | select(.name == "dist") | .archive_download_url')
+        unzip dist.zip -d ./dist
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add .
+        git commit -m "Deploy Angular app"
+        git push https://Trackify-Issue-Tracker:${GITHUB_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
