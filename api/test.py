@@ -19,14 +19,15 @@ This test suite covers the following endpoints:
 
 # pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-public-methods, no-else-return, no-else-break
 
+import os
 import sys
 import unittest
 import json
 import psycopg2
-from api import app, POSTGRES_URL
+from api import app
 
 
-created_projects = set()
+POSTGRES_URL = os.environ["POSTGRES_URL"]
 
 
 class TestAPI(unittest.TestCase):

@@ -71,8 +71,8 @@ jobs:
         cd ./app/dist
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git add .
+        git add -f .
         git commit -m "Deploy Angular app"
-        git push https://Trackify-Issue-Tracker:${GITHUB_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main
+        git push https://Trackify-Issue-Tracker:${GITHUB_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git ${{ github.event.pull_request.head.ref }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
