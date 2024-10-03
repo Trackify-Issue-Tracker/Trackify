@@ -23,7 +23,7 @@ export interface Issue {
 }
 
 interface JsonResponse {
-    // eslint-disable-next-line no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     message: any;
 }
 
@@ -42,7 +42,7 @@ export class ApiService {
         );
     }
 
-    createProject(project: Project): Observable<Object> {
+    createProject(project: Project): Observable<object> {
         return this.http.post(`${this.apiUrl}/projects`, project);
     }
 
@@ -52,12 +52,12 @@ export class ApiService {
         );
     }
 
-    updateProject(project_id: string, value: Project): Observable<Object> {
+    updateProject(project_id: string, value: Project): Observable<object> {
         return this.http.put(`${this.apiUrl}/projects/${project_id}`, value);
     }
     // TODO: edit this
 
-    deleteProject(project_id: string): Observable<Object> {
+    deleteProject(project_id: string): Observable<object> {
         return this.http.delete(`${this.apiUrl}/projects/${project_id}`);
     }
 
@@ -67,7 +67,7 @@ export class ApiService {
         );
     }
 
-    createIssue(issue: Issue): Observable<Object> {
+    createIssue(issue: Issue): Observable<object> {
         return this.http.post(`${this.apiUrl}/projects/${issue.project_id}/issues`, issue);
     }
 
@@ -77,11 +77,11 @@ export class ApiService {
         );
     }
 
-    updateIssue(issue_id: string, value: Issue): Observable<Object> {
+    updateIssue(issue_id: string, value: Issue): Observable<object> {
         return this.http.put(`${this.apiUrl}/issues/${issue_id}`, value);
     }
 
-    deleteIssue(issue_id: string): Observable<Object> {
+    deleteIssue(issue_id: string): Observable<object> {
         return this.http.delete(`${this.apiUrl}/issues/${issue_id}`);
     }
 
