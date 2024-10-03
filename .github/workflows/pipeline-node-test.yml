@@ -53,9 +53,9 @@ jobs:
     - name: Test Angular app
       run: |
         cd app
-        npm run ng test
+        ng test--browsers=ChromeHeadless --watch=false
 
     - name: Build Angular app
       run: |
         cd app
-        npm run ng build --prod
+        ng build --prod

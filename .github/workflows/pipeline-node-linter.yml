@@ -44,9 +44,9 @@ jobs:
         cd app
         npm install
         npm install -g @angular/cli@17 > /dev/null 
-        npm run ng add @angular-eslint/schematics
+        ng add @angular-eslint/schematics --skip-confirmation
 
     - name: Lint Angular app
       run: |
         cd app
-        npm run ng lint
+        ng lint
