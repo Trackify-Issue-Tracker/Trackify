@@ -15,12 +15,17 @@
 name: Build and Push Angular web app to trackify-live-app repo
 
 # On merge to main
+# on:
+#   pull_request:
+#     branches:
+#       - main
+#     types:
+#       - closed
 on:
   pull_request:
     branches:
       - main
-    types:
-      - closed
+      - nonprod
 
 env:
   API_SETTING: 'local'

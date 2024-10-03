@@ -21,4 +21,4 @@ jobs:
     
     - name: Test the Python API
       run: |
-        docker compose exec backend-container python test.py <<< "y"
+        docker exec -i backend-container python test.py <<< "y"
