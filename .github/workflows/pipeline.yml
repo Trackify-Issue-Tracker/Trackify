@@ -39,12 +39,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Install dependencies
+      run: |
+        cd app
+        npm install
+        npm install -g @angular/cli@17 > /dev/null 
+
     # Build and push the Angular app
     - name: Build Angular app
       run: |
         cd app
-        npm install
-        ng build --prod
+        npm run ng build --prod
 
     - name: Upload Angular app
       uses: actions/upload-artifact@v4

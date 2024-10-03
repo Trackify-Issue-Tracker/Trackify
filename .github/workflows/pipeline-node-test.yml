@@ -22,38 +22,40 @@ jobs:
         node-version: 18.x
         cache: 'npm'
 
-    # - name: Install dependencies
+
+
+    # - name: Install Dependencies
     #   run: |
     #     cd app
-    #     npm install
-    #     npm install -g @angular/cli@17 > /dev/null 
-
-    - name: Install Dependencies
-      run: |
-        cd app
-        npm ci
+    #     npm ci
           
-    - name: Run Unit Tests
-      run: |
-        cd app
-        npm run ci:test
+    # - name: Run Unit Tests
+    #   run: |
+    #     cd app
+    #     npm run ci:test
 
-    - name: Clean Distribution Directory
-      run: |
-        cd app
-        npm run ci:clean
-      
-    - name: Build Application
-      run: |
-        cd app
-        npm run ci:build
-      
-    # - name: Build Angular app
+    # - name: Clean Distribution Directory
     #   run: |
     #     cd app
-    #     npm run ng build --prod
+    #     npm run ci:clean
+      
+    # - name: Build Application
+    #   run: |
+    #     cd app
+    #     npm run ci:build
+
+    - name: Install dependencies
+      run: |
+        cd app
+        npm install
+        npm install -g @angular/cli@17 > /dev/null 
         
-    # - name: Test Angular app
-    #   run: |
-    #     cd app
-    #     npm test
+    - name: Test Angular app
+      run: |
+        cd app
+        npm run ng test
+
+    - name: Build Angular app
+      run: |
+        cd app
+        npm run ng build --prod
