@@ -22,6 +22,9 @@ export interface Issue {
     description: string;
 }
 
+interface JsonResponse {
+    message: any;
+}
 
 @Injectable({
     providedIn: 'root'
@@ -33,8 +36,8 @@ export class ApiService {
     constructor(private http: HttpClient) { }
 
     getAllProjects(): Observable<Project[]> {
-        return this.http.get(`${this.apiUrl}/projects`).pipe(
-            map((response: any) => response.message)
+        return this.http.get<JsonResponse>(`${this.apiUrl}/projects`).pipe(
+            map((response: JsonResponse) => response.message)
         );
     }
 
@@ -43,12 +46,12 @@ export class ApiService {
     }
 
     getProject(project_id: string): Observable<Project> {
-        return this.http.get(`${this.apiUrl}/projects/${project_id}`).pipe(
-            map((response: any) => response.message)
+        return this.http.get<JsonResponse>(`${this.apiUrl}/projects/${project_id}`).pipe(
+            map((response: JsonResponse) => response.message)
         );
     }
 
-    updateProject(project_id: string, value: any): Observable<any> {
+    updateProject(project_id: string, value: Project): Observable<any> {
         return this.http.put(`${this.apiUrl}/projects/${project_id}`, value);
     }
     // TODO: edit this
@@ -58,8 +61,8 @@ export class ApiService {
     }
 
     getAllIssuesOfProject(project_id: string): Observable<Issue[]> {
-        return this.http.get(`${this.apiUrl}/projects/${project_id}/issues`).pipe(
-            map((response: any) => response.message)
+        return this.http.get<JsonResponse>(`${this.apiUrl}/projects/${project_id}/issues`).pipe(
+            map((response: JsonResponse) => response.message)
         );
     }
 
@@ -68,12 +71,12 @@ export class ApiService {
     }
 
     getIssue(issue_id: string): Observable<Issue> {
-        return this.http.get(`${this.apiUrl}/issues/${issue_id}`).pipe(
-            map((response: any) => response.message)
+        return this.http.get<JsonResponse>(`${this.apiUrl}/issues/${issue_id}`).pipe(
+            map((response: JsonResponse) => response.message)
         );
     }
 
-    updateIssue(issue_id: string, value: any): Observable<any> {
+    updateIssue(issue_id: string, value: Issue): Observable<any> {
         return this.http.put(`${this.apiUrl}/issues/${issue_id}`, value);
     }
 
@@ -82,8 +85,8 @@ export class ApiService {
     }
 
     getAllIssues(): Observable<Issue[]> {
-        return this.http.get(`${this.apiUrl}/issues`).pipe(
-            map((response: any) => response.message)
+        return this.http.get<JsonResponse>(`${this.apiUrl}/issues`).pipe(
+            map((response: JsonResponse) => response.message)
         );
     }
 
