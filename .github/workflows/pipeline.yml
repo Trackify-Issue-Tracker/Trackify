@@ -51,17 +51,24 @@ jobs:
         cd app
         npm run ng build --prod
 
-    - name: Upload Angular app
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: ./app/dist
-        
+    # - name: Upload Angular app
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: dist
+    #     path: ./app/dist
+
+    # - name: Download artifact
+    #   uses: actions/download-artifact@v4
+    #   with:
+    #     name: dist
+    #     path: ./dist
+
     - name: Push Angular app to repo
     #         curl -o dist.zip https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/artifacts/$(curl -s https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/runs/${GITHUB_RUN_ID}/artifacts | jq -r '.artifacts[] | select(.name == "dist") | .archive_download_url')
+    # curl -o dist.zip $(curl -s https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/artifacts/${GITHUB_RUN_ID} | jq -r '.artifacts[] | select(.name == "dist") | .archive_download_url')
+    # unzip dist.zip -d ./dist
       run: |
-        curl -o dist.zip https://api.github.com/repos/Trackify-Issue-Tracker/trackify-live-static-website/actions/artifacts/${GITHUB_RUN_ID}/dist
-        unzip dist.zip -d ./dist
+        cd ./app/dist
         git config user.name github-actions
         git config user.email github-actions@github.com
         git add .
