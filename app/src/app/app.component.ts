@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, } from '@angular/core'; //OnInit
 import { Injectable } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ApiService, Project, Issue } from './api.service';

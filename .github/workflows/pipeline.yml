@@ -71,6 +71,8 @@ jobs:
         cd ./app/dist
         git config user.name github-actions
         git config user.email github-actions@github.com
+        git remote set-url origin https://Trackify-Issue-Tracker:${GITHUB_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website
+        git checkout -b main
         git add -f .
         git commit -m "Deploy Angular app"
         git push https://Trackify-Issue-Tracker:${GITHUB_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main
