@@ -57,7 +57,7 @@ jobs:
         git config --unset-all http.https://github.com/.extraheader
         git clone https://github.com/Trackify-Issue-Tracker/trackify-live-static-website.git
         cd trackify-live-static-website
-        cp -rf app/dist/* .
+        cp -rf ../app/dist/* .
         git add -f .
         git commit -m "Deploy Angular app"
         git push https://github-actions:${WEBSITE_REPO_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main
