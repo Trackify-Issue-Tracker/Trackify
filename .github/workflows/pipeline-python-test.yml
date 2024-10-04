@@ -18,7 +18,15 @@ jobs:
     - name: Build and run the app's containers
       run: |
         docker compose up -d
-    
+
+    - name: Wait for PostgreSQL to start
+      run: |
+        sleep 10
+
+    - name: Get postgres
+      run: |
+        docker exec -i database-container echo "$PGDATA"
+        
     - name: Get the IP address of the postgres container
       run: |
         POSTGRES_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' database-container)
