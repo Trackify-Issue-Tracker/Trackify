@@ -52,14 +52,12 @@ jobs:
 
     - name: Push Angular app to repo
       run: |
-        mkdir trackify-live-static-website
-        cd trackify-live-static-website
         git config user.name github-actions
         git config user.email github-actions@github.com
         git config --unset-all http.https://github.com/.extraheader
-        git remote set-url origin https://github-actions:${WEBSITE_REPO_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website
-        git pull origin main
-        cp -r app/dist/* .
+        git clone https://github.com/Trackify-Issue-Tracker/trackify-live-static-website.git
+        cd trackify-live-static-website
+        cp -rf app/dist/* .
         git add -f .
         git commit -m "Deploy Angular app"
         git push https://github-actions:${WEBSITE_REPO_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main
