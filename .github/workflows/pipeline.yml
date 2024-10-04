@@ -58,8 +58,7 @@ jobs:
         git config user.email github-actions@github.com
         git config --unset-all http.https://github.com/.extraheader
         git remote set-url origin https://github-actions:${WEBSITE_REPO_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website
-        git checkout -b main
-        git pull
+        git pull origin main
         cp -r app/dist/* .
         git add -f .
         git commit -m "Deploy Angular app"
