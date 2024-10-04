@@ -55,7 +55,8 @@ jobs:
         git clone https://github.com/Trackify-Issue-Tracker/trackify-live-static-website.git
         echo "Cloned repo."
         cd trackify-live-static-website
-        cp -rf ../app/dist/* .
+        cp -rf ../app/dist/app/browser/* .
+        cp -rf ../app/dist/app/3rdpartylicenses.txt 3rdpartylicenses.txt
         echo "Copied data."
         git config user.name github-actions
         git config user.email github-actions@github.com
