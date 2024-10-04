@@ -22,28 +22,6 @@ jobs:
         node-version: 18.x
         cache: 'npm'
 
-
-
-    # - name: Install Dependencies
-    #   run: |
-    #     cd app
-    #     npm ci
-          
-    # - name: Run Unit Tests
-    #   run: |
-    #     cd app
-    #     npm run ci:test
-
-    # - name: Clean Distribution Directory
-    #   run: |
-    #     cd app
-    #     npm run ci:clean
-      
-    # - name: Build Application
-    #   run: |
-    #     cd app
-    #     npm run ci:build
-
     - name: Install dependencies
       run: |
         cd app
@@ -53,8 +31,8 @@ jobs:
     - name: Test Angular app
       run: |
         cd app
-        ng test --browsers=ChromeHeadless --watch=false
-
+        ng test --browsers=ChromeHeadless 
+#--watch=false
     - name: Build Angular app
       run: |
         cd app
