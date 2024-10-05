@@ -51,6 +51,7 @@ jobs:
         npm run ng build --prod
 
     - name: Push Angular app to repo
+    #git diff --quiet && git diff --staged --quiet || 
       run: |
         git clone https://github.com/Trackify-Issue-Tracker/trackify-live-static-website.git
         echo "Cloned repo."
@@ -61,8 +62,8 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git add -f .
-        git commit -m "Deploy Angular app"
+        git commit -m "Deploy Angular app" || echo "No changes to commit"
         echo "Pushing..."
-        git push https://svparekh:${WEBSITE_REPO_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main
+        git push https://svparekh:${WEBSITE_REPO_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main || echo "No changes to push"
       env:
         WEBSITE_REPO_TOKEN: ${{ secrets.WEBSITE_REPO_TOKEN }}
