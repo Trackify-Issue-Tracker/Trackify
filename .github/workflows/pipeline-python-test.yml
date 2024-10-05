@@ -1,0 +1,28 @@
+name: Python Tester
+
+# On PR to main or nonprod
+on:
+  pull_request:
+    branches:
+      - main
+      - nonprod
+
+jobs:
+  python-test:
+    name: Test the Python API
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build and run the app's containers
+      run: |
+        docker compose up -d
+
+    - name: Wait for PostgreSQL to start
+      run: |
+        sleep 15
+
+    - name: Test the Python API
+      run: |
+        docker exec -i backend-container python test.py <<< "y"

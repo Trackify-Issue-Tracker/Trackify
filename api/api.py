@@ -22,12 +22,15 @@ API Endpoints:
 /issues/{id} - DELETE issue by issue ID
 /reset - DELETE all data in the database
 """
-import psycopg2
+
+# pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-return-statements, no-else-return, no-else-break
+
 import os
+import psycopg2
 from flask import Flask, jsonify, request
 
 
-POSTGRES_URL = os.environ['POSTGRES_URL']
+POSTGRES_URL = os.environ["POSTGRES_URL"]
 app = Flask(__name__)
 
 
@@ -67,11 +70,21 @@ async def delete_everything():
             conn.close()
             return jsonify({"message": "Data deleted successfully"}), 204
         except psycopg2.Error as e:
-            return jsonify({"message": f"An error occurred while trying to delete the data: {str(e)}"}), 500
-        
+            return (
+                jsonify(
+                    {
+                        "message": f"An error occurred while trying to delete the data: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/projects", methods=["GET"])
@@ -96,11 +109,21 @@ async def get_all_projects():
             conn.close()
             return jsonify({"message": rows}), 200
         except psycopg2.Error as e:
-            return jsonify({"message": f"An issue occured when trying to get all projects: {str(e)}"}), 500  
-    
+            return (
+                jsonify(
+                    {
+                        "message": f"An issue occured when trying to get all projects: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/projects", methods=["POST"])
@@ -124,7 +147,10 @@ async def create_project():
         # Get the project data
         request_json = request.get_json(silent=True)
         if request_json is None:
-            return jsonify({"message": f"Could not parse json data: {request.data}"}), 415
+            return (
+                jsonify({"message": f"Could not parse json data: {request.data}"}),
+                415,
+            )
 
         # Initialize variables
         name = None
@@ -132,19 +158,29 @@ async def create_project():
 
         # Validate the data provided
         # Name field is required, throw error if not provided
-        if 'name' in request_json:
-            name = request_json['name']
+        if "name" in request_json:
+            name = request_json["name"]
         else:
-            return jsonify({"message": "Invalid request, no name provided. This is a required field"}), 400
+            return (
+                jsonify(
+                    {
+                        "message": "Invalid request, no name provided. This is a required field"
+                    }
+                ),
+                400,
+            )
         # Description field is optional, get if available
-        if 'description' in request_json:
-            description = request_json['description']
+        if "description" in request_json:
+            description = request_json["description"]
         else:
             description = ""
 
         # Attempt operation
         try:
-            cur.execute("INSERT INTO projects (name, description) VALUES (%s, %s)", (name, description))
+            cur.execute(
+                "INSERT INTO projects (name, description) VALUES (%s, %s)",
+                (name, description),
+            )
             conn.commit()
             row_delta = cur.rowcount
             cur.close()
@@ -158,12 +194,19 @@ async def create_project():
             else:
                 return jsonify({"message": "Data was not added successfully"}), 500
         except psycopg2.Error as e:
-            return jsonify({"message": f"An issue occured when trying to add the project: {str(e)}"}), 500            
+            return (
+                jsonify(
+                    {
+                        "message": f"An issue occured when trying to add the project: {str(e)}"
+                    }
+                ),
+                500,
+            )
 
     # If database has connection or other error
     except psycopg2.Error as e:
-                return jsonify({"message": str(e)}), 500
-    
+        return jsonify({"message": str(e)}), 500
+
 
 @app.route("/projects/<project_id>", methods=["GET"])
 async def get_project_by_id(project_id):
@@ -193,9 +236,19 @@ async def get_project_by_id(project_id):
             else:
                 return jsonify({"message": "Project not found"}), 404
         except psycopg2.Error as e:
-            return jsonify({"message": f"An issue occured when trying to get the project: {str(e)}"}), 500  
+            return (
+                jsonify(
+                    {
+                        "message": f"An issue occured when trying to get the project: {str(e)}"
+                    }
+                ),
+                500,
+            )
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/projects/<project_id>", methods=["PUT"])
@@ -218,35 +271,53 @@ async def update_project_by_id(project_id):
         # Get the updated project
         request_json = request.get_json(silent=True)
         if request_json is None:
-            return jsonify({"message": f"Could not parse json data: {request.data}"}), 415
+            return (
+                jsonify({"message": f"Could not parse json data: {request.data}"}),
+                415,
+            )
 
         # Initialize variables
         name = None
         description = None
 
         # Get the data provided
-        if 'name' in request_json:
-            name = request_json['name']
-        if 'description' in request_json:
-            description = request_json['description']
+        if "name" in request_json:
+            name = request_json["name"]
+        if "description" in request_json:
+            description = request_json["description"]
 
         # Attempt operation
         try:
             # Update specified parts
             if name:
-                cur.execute("UPDATE projects SET name = %s WHERE id = %s", (name, project_id))    
+                cur.execute(
+                    "UPDATE projects SET name = %s WHERE id = %s", (name, project_id)
+                )
             if description:
-                cur.execute("UPDATE projects SET description = %s WHERE id = %s", (description, project_id))          
+                cur.execute(
+                    "UPDATE projects SET description = %s WHERE id = %s",
+                    (description, project_id),
+                )
             conn.commit()
             cur.close()
             conn.close()
             return jsonify({"message": "Data updated successfully"}), 200
         except psycopg2.Error as e:
-            return jsonify({"message": f"An issue occured when trying to get the project: {str(e)}"}), 500  
-    
+            return (
+                jsonify(
+                    {
+                        "message": f"An issue occured when trying to get the project: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/projects/<project_id>", methods=["DELETE"])
@@ -274,11 +345,21 @@ async def delete_project_by_id(project_id):
             conn.close()
             return jsonify({"message": "Data deleted successfully"}), 204
         except psycopg2.Error as e:
-            return jsonify({"message": f"An error occurred while trying to delete the data: {str(e)}"}), 500
-        
+            return (
+                jsonify(
+                    {
+                        "message": f"An error occurred while trying to delete the data: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/projects/<project_id>/issues", methods=["GET"])
@@ -305,11 +386,21 @@ async def get_issues_by_project_id(project_id):
             conn.close()
             return jsonify({"message": rows}), 200
         except psycopg2.Error as e:
-            return jsonify({"message": f"An error occurred while trying to get all issues: {str(e)}"}), 500
-    
+            return (
+                jsonify(
+                    {
+                        "message": f"An error occurred while trying to get all issues: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/projects/<project_id>/issues", methods=["POST"])
@@ -331,7 +422,10 @@ async def create_issue_by_project_id(project_id):
         # Get issue data
         request_json = request.get_json(silent=True)
         if request_json is None:
-            return jsonify({"message": f"Could not parse json data: {request.data}"}), 415
+            return (
+                jsonify({"message": f"Could not parse json data: {request.data}"}),
+                415,
+            )
 
         # Initialize variables
         title = None
@@ -339,19 +433,29 @@ async def create_issue_by_project_id(project_id):
 
         # Validate the data provided
         # Title field is required, throw error if not provided
-        if 'title' in request_json:
-            title = request_json['title']
+        if "title" in request_json:
+            title = request_json["title"]
         else:
-            return jsonify({"message": "Invalid request, no title provided. This is a required field"}), 400
+            return (
+                jsonify(
+                    {
+                        "message": "Invalid request, no title provided. This is a required field"
+                    }
+                ),
+                400,
+            )
         # Description field is optional, get if available
-        if 'description' in request_json:
-            description = request_json['description']
+        if "description" in request_json:
+            description = request_json["description"]
         else:
             description = ""
 
         # Attempt operation
         try:
-            cur.execute("INSERT INTO issues (project_id, title, description) VALUES (%s, %s, %s)", (project_id, title, description))
+            cur.execute(
+                "INSERT INTO issues (project_id, title, description) VALUES (%s, %s, %s)",
+                (project_id, title, description),
+            )
             conn.commit()
             row_delta = cur.rowcount
             cur.close()
@@ -365,10 +469,20 @@ async def create_issue_by_project_id(project_id):
             else:
                 return jsonify({"message": "Data was not added successfully"}), 500
         except psycopg2.Error as e:
-            return jsonify({"message": f"An error occurred while trying to create an issue: {str(e)}"}), 500
-    
+            return (
+                jsonify(
+                    {
+                        "message": f"An error occurred while trying to create an issue: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/issues/<issue_id>", methods=["GET"])
@@ -391,7 +505,9 @@ async def get_issue_by_id(issue_id):
 
         # Attempt operation
         try:
-            cur.execute("SELECT * FROM issues WHERE id = %s", (issue_id,)) # AND project_id = %s
+            cur.execute(
+                "SELECT * FROM issues WHERE id = %s", (issue_id,)
+            )  # AND project_id = %s
             row = cur.fetchone()
             cur.close()
             conn.close()
@@ -400,11 +516,21 @@ async def get_issue_by_id(issue_id):
             else:
                 return jsonify({"message": "Issue not found"}), 404
         except psycopg2.Error as e:
-            return jsonify({"message": f"An error occurred while trying to get the issue: {str(e)}"}), 500
-        
+            return (
+                jsonify(
+                    {
+                        "message": f"An error occurred while trying to get the issue: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/issues/<issue_id>", methods=["PUT"])
@@ -428,7 +554,10 @@ async def update_issue_by_id(issue_id):
         # Get issue data
         request_json = request.get_json(silent=True)
         if request_json is None:
-            return jsonify({"message": f"Could not parse json data: {request.data}"}), 415
+            return (
+                jsonify({"message": f"Could not parse json data: {request.data}"}),
+                415,
+            )
 
         # Initialize variables
         title = None
@@ -437,33 +566,51 @@ async def update_issue_by_id(issue_id):
 
         # Get the data provided
         # Title field is required, throw error if not provided
-        if 'project_id' in request_json:
-            project_id = request_json['project_id']
-        if 'title' in request_json:
-            title = request_json['title']
-        if 'description' in request_json:
-            description = request_json['description']
-        
+        if "project_id" in request_json:
+            project_id = request_json["project_id"]
+        if "title" in request_json:
+            title = request_json["title"]
+        if "description" in request_json:
+            description = request_json["description"]
+
         # Attempt operation
         try:
             # Update specified parts
             if project_id:
-                cur.execute("UPDATE issues SET project_id = %s WHERE id = %s", (project_id, issue_id))
+                cur.execute(
+                    "UPDATE issues SET project_id = %s WHERE id = %s",
+                    (project_id, issue_id),
+                )
             if title:
-                cur.execute("UPDATE issues SET title = %s WHERE id = %s", (title, issue_id))    
+                cur.execute(
+                    "UPDATE issues SET title = %s WHERE id = %s", (title, issue_id)
+                )
             if description:
-                cur.execute("UPDATE issues SET description = %s WHERE id = %s", (description, issue_id))
-            
+                cur.execute(
+                    "UPDATE issues SET description = %s WHERE id = %s",
+                    (description, issue_id),
+                )
+
             conn.commit()
             cur.close()
             conn.close()
             return jsonify({"message": "Data updated successfully"}), 200
         except psycopg2.Error as e:
-            return jsonify({"message": f"An issue occured when trying to update the issue: {str(e)}"}), 500 
+            return (
+                jsonify(
+                    {
+                        "message": f"An issue occured when trying to update the issue: {str(e)}"
+                    }
+                ),
+                500,
+            )
 
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/issues/<issue_id>", methods=["DELETE"])
@@ -491,11 +638,21 @@ async def delete_issue_by_id(issue_id):
             conn.close()
             return jsonify({"message": "Data deleted successfully"}), 204
         except psycopg2.Error as e:
-            return jsonify({"message": f"An error occurred while trying to delete the data: {str(e)}"}), 500
-        
+            return (
+                jsonify(
+                    {
+                        "message": f"An error occurred while trying to delete the data: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 @app.route("/issues", methods=["GET"])
@@ -512,7 +669,7 @@ async def get_all_issues():
         # Attempt to connect to the database
         conn = psycopg2.connect(POSTGRES_URL)
         cur = conn.cursor()
-        
+
         # Attempt operation
         try:
             cur.execute("SELECT * FROM issues")
@@ -521,14 +678,23 @@ async def get_all_issues():
             conn.close()
             return jsonify({"message": rows}), 200
         except psycopg2.Error as e:
-            return jsonify({"message": f"An issue occured when trying to get all projects: {str(e)}"}), 500  
-    
+            return (
+                jsonify(
+                    {
+                        "message": f"An issue occured when trying to get all projects: {str(e)}"
+                    }
+                ),
+                500,
+            )
+
     # If database has connection or other error
     except psycopg2.Error as e:
-        return jsonify({"message": f"A connection or other issue occured: {str(e)}"}), 500
+        return (
+            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
+            500,
+        )
 
 
 # Run the FastAPI application
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5001)

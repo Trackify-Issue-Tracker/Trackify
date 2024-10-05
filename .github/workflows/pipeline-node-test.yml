@@ -1,0 +1,39 @@
+name: Angular Tester
+
+on:
+  pull_request:
+    branches:
+      - main
+      - nonprod
+
+jobs:
+  test-js:
+    name: Test the Angular App
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        cd app
+        npm install
+        npm install -g @angular/cli@17 > /dev/null 
+        
+    - name: Test Angular app
+      run: |
+        cd app
+        ng test --browsers=ChromeHeadless --watch=false
+        
+    - name: Build Angular app
+      run: |
+        cd app
+        npm run ng build --prod

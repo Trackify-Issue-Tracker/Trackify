@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, } from '@angular/core'; //OnInit
 import { Injectable } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ApiService, Project, Issue } from './api.service';
@@ -14,21 +14,24 @@ import { ApiService, Project, Issue } from './api.service';
 @Injectable({
   providedIn: 'root'
 })
-export class AppComponent implements OnInit {
+export class AppComponent { // implements OnInit
   title = 'app';
   issues: Issue[] = [];
   projects: Project[] = [];
 
-  constructor(private apiService: ApiService) { }
-
-  ngOnInit(): void {
+  constructor(private apiService: ApiService) {
     this.getIssues();
     this.getProjects();
   }
 
-  ngOnDestroy(): void {
+  // ngOnInit(): void {
+  //   this.getIssues();
+  //   this.getProjects();
+  // }
 
-  }
+  // ngOnDestroy(): void {
+
+  // }
 
   createProject(): void {
     // Make the project
@@ -60,7 +63,7 @@ export class AppComponent implements OnInit {
 
   createIssue(): void {
     // Make the issue
-    var issue: Issue = {
+    const issue: Issue = {
       id: '', // doesn't get used
       project_id: this.projects[0]['id'],
       title: 'New Issue',

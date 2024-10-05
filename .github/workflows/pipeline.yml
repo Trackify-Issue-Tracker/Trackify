@@ -1,0 +1,56 @@
+# Build angular app and push it to the trackify-live-static-website repo so that github pages and display the app
+# Create an in-memory database and have the angular app use that through setting environmental variables
+# thus the containers won't be used for the live app since github pages only allows static webpages
+# To use the containers, you must have docker installed and run the compose file locally. Then you can access
+# the app using localhost:5000, which will then use the python container api and the postgres container database.
+
+# Test api using ./api/test.py but needs to be run in the docker compose container for api
+# Test index.html
+
+name: Build and Push Angular web app to trackify-live-app repo
+
+# On merge to main
+on:
+  push:
+    branches:
+      - main
+
+env:
+  API_SETTING: 'local'
+
+jobs:
+  build-and-push:
+    name: Build Project and Push to repo
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        cd app
+        npm install
+        npm install -g @angular/cli@17 > /dev/null 
+
+    - name: Build Angular app
+      run: |
+        cd app
+        npm run ng build --prod
+
+    - name: Push Angular app to repo
+      run: |
+        git clone https://github.com/Trackify-Issue-Tracker/trackify-live-static-website.git
+        echo "Cloned repo."
+        cd trackify-live-static-website
+        cp -rf ../app/dist/app/browser/* .
+        cp -rf ../app/dist/app/3rdpartylicenses.txt 3rdpartylicenses.txt
+        echo "Copied data."
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add -f .
+        git commit -m "Deploy Angular app" || echo "No changes to commit"
+        echo "Pushing..."
+        git push https://svparekh:${WEBSITE_REPO_TOKEN}@github.com/Trackify-Issue-Tracker/trackify-live-static-website.git main || echo "No changes to push"
+      env:
+        WEBSITE_REPO_TOKEN: ${{ secrets.WEBSITE_REPO_TOKEN }}
