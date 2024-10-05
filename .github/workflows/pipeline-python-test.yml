@@ -21,11 +21,7 @@ jobs:
 
     - name: Wait for PostgreSQL to start
       run: |
-        sleep 10
-
-    - name: Get postgres
-      run: |
-        docker exec -i database-container echo "$PGDATA"
+        sleep 15
         
     - name: Get the IP address of the postgres container
       run: |
