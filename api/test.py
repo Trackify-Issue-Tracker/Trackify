@@ -19,15 +19,15 @@ This test suite covers the following endpoints:
 
 # pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-public-methods, no-else-return, no-else-break
 
-import os
+# import os
 import sys
 import unittest
 import json
 import psycopg2
-from api import app
+from api import app, POSTGRES_URL
 
 
-POSTGRES_URL = os.environ["POSTGRES_URL"]
+# POSTGRES_URL = os.environ["POSTGRES_URL"]
 
 
 class TestAPI(unittest.TestCase):
@@ -99,6 +99,7 @@ class TestAPI(unittest.TestCase):
         response = self.app.post(
             "/projects", data=json.dumps(project_data), content_type="application/json"
         )
+        print(response.json)
         # Test
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json["message"], "Data added successfully")
@@ -176,6 +177,7 @@ class TestAPI(unittest.TestCase):
             data=json.dumps(issue_data),
             content_type="application/json",
         )
+        print(response.json)
         # Test
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json["message"], "Data added successfully")
