@@ -22,14 +22,7 @@ jobs:
     - name: Wait for PostgreSQL to start
       run: |
         sleep 15
-        
-    # - name: Get the IP address of the postgres container
-    #   run: |
-    #     POSTGRES_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' database-container)
-    #     echo "POSTGRES_IP=$POSTGRES_IP" >> $GITHUB_ENV
 
     - name: Test the Python API
-      # env:
-      #   POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_IP}:5432/${POSTGRES_DB}
       run: |
         docker exec -i backend-container python test.py <<< "y"
