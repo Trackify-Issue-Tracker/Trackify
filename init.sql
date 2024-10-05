@@ -12,5 +12,3 @@ CREATE TABLE IF NOT EXISTS issues (
   description TEXT,
   FOREIGN KEY (project_id) REFERENCES projects (id)
 );
-
-INSERT INTO projects (name, description) VALUES ('test', 'this is a test')

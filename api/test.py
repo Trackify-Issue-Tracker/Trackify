@@ -35,9 +35,14 @@ class TestAPI(unittest.TestCase):
     Test suite for API endpoints
     """
 
+    test_project_ids = []
+    test_issue_ids = []
+
     def setUp(self):
         self.app = app.test_client()
         create_test_data()
+        self.test_project_ids = get_test_project_ids()
+        self.test_issue_ids = get_test_issue_ids()
 
     def tearDown(self):
         """
@@ -75,6 +80,8 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(self.app.get("/issues").json["message"], [])
         # If reset passes, recreate the data needed for other tests
         create_test_data()
+        self.test_project_ids = get_test_project_ids()
+        self.test_issue_ids = get_test_issue_ids()
 
     def test_root_endpoint(self):
         """
@@ -99,7 +106,6 @@ class TestAPI(unittest.TestCase):
         response = self.app.post(
             "/projects", data=json.dumps(project_data), content_type="application/json"
         )
-        print(response.json)
         # Test
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json["message"], "Data added successfully")
@@ -121,11 +127,11 @@ class TestAPI(unittest.TestCase):
         with the project's data when given a valid ID.
         """
         # Call
-        response = self.app.get("/projects/1")
+        response = self.app.get(f"/projects/{self.test_project_ids[0]}")
         # Test
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.json["message"], list)
-        self.assertEqual(response.json["message"][0], 1)
+        self.assertEqual(response.json["message"][0], self.test_project_ids[0])
 
     def test_update_project(self):
         """
@@ -138,12 +144,12 @@ class TestAPI(unittest.TestCase):
             "description": "This is an updated test Project 1",
         }
         response = self.app.put(
-            "/projects/1",
+            f"/projects/{self.test_project_ids[0]}",
             data=json.dumps(project_data),
             content_type="application/json",
         )
         # Get the updated project
-        response_updated = self.app.get("/projects/1")
+        response_updated = self.app.get(f"/projects/{self.test_project_ids[0]}")
         # Test
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["message"], "Data updated successfully")
@@ -155,15 +161,17 @@ class TestAPI(unittest.TestCase):
         project and all its associated issues from the database when given a valid ID.
         """
         # Call
-        response = self.app.delete("/projects/2")
+        response = self.app.delete(f"/projects/{self.test_project_ids[1]}")
         # Ensure deletion of project
-        response_del = self.app.get("/projects/2")
+        response_del = self.app.get(f"/projects/{self.test_project_ids[1]}")
         # # Ensure deletion of issue
-        response_issue_del = self.app.get("/issues/2")
+        response_issue_del = self.app.get(
+            f"/projects/{self.test_project_ids[1]}/issues"
+        )
         # Test
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response_del.status_code, 404)
-        self.assertEqual(response_issue_del.status_code, 404)
+        self.assertEqual(response_issue_del.json["message"], [])
 
     def test_create_issue(self):
         """
@@ -173,11 +181,10 @@ class TestAPI(unittest.TestCase):
         # Call
         issue_data = {"title": "Test Issue", "description": "This is a test issue"}
         response = self.app.post(
-            "/projects/1/issues",
+            f"/projects/{self.test_project_ids[0]}/issues",
             data=json.dumps(issue_data),
             content_type="application/json",
         )
-        print(response.json)
         # Test
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json["message"], "Data added successfully")
@@ -188,11 +195,11 @@ class TestAPI(unittest.TestCase):
         with a list of all issues in the project when given valid data.
         """
         # Call
-        response = self.app.get("/projects/1/issues")
+        response = self.app.get(f"/projects/{self.test_project_ids[0]}/issues")
         # Test
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.json["message"], list)
-        self.assertEqual(response.json["message"][0][1], 1)
+        self.assertEqual(response.json["message"][0][1], self.test_project_ids[0])
 
     def test_get_issues(self):
         """
@@ -211,11 +218,11 @@ class TestAPI(unittest.TestCase):
         with the issue's data when given a valid ID.
         """
         # Call
-        response = self.app.get("/issues/1")
+        response = self.app.get(f"/issues/{self.test_issue_ids[0]}")
         # Test
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.json["message"], list)
-        self.assertEqual(response.json["message"][0], 1)
+        self.assertEqual(response.json["message"][0], self.test_issue_ids[0])
 
     def test_update_issue(self):
         """
@@ -228,12 +235,12 @@ class TestAPI(unittest.TestCase):
             "description": "This is an updated test issue 1 for project 1",
         }
         response = self.app.put(
-            "/issues/1",
+            f"/issues/{self.test_issue_ids[0]}",
             data=json.dumps(issue_data),
             content_type="application/json",
         )
         # Get updated issue
-        response_updated = self.app.get("/issues/1")
+        response_updated = self.app.get(f"/issues/{self.test_issue_ids[0]}")
         # Test
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["message"], "Data updated successfully")
@@ -247,9 +254,9 @@ class TestAPI(unittest.TestCase):
         issue from the database when given a valid ID.
         """
         # Call
-        response = self.app.delete("/issues/3")
-        # # Ensure deletion of issue
-        response_issue_del = self.app.get("/issues/3")
+        response = self.app.delete(f"/issues/{self.test_issue_ids[2]}")
+        # Ensure deletion of issue
+        response_issue_del = self.app.get(f"/issues/{self.test_issue_ids[2]}")
         # Test
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response_issue_del.status_code, 404)
@@ -260,7 +267,7 @@ class TestAPI(unittest.TestCase):
         Test that the get project endpoint returns a 404 status code and an error
         message when given an invalid project ID.
         """
-        response = self.app.get("/projects/6000")
+        response = self.app.get("/projects/10000")
         self.assertEqual(response.status_code, 404)
 
     def test_invalid_issue_id(self):
@@ -268,7 +275,7 @@ class TestAPI(unittest.TestCase):
         Test that the get issue endpoint returns a 404 status code and an error
         message when given an invalid issue ID.
         """
-        response = self.app.get("/issues/6000")
+        response = self.app.get("/issues/10000")
         self.assertEqual(response.status_code, 404)
 
     def test_empty_project_data(self):
@@ -288,7 +295,7 @@ class TestAPI(unittest.TestCase):
         """
         # Call
         response = self.app.post(
-            "/projects/1/issues",
+            f"/projects/{self.test_project_ids[0]}/issues",
             data=json.dumps({}),
             content_type="application/json",
         )
@@ -314,7 +321,7 @@ class TestAPI(unittest.TestCase):
         # Call
         issue_data = {"invalid-key": "Invalid value"}
         response = self.app.post(
-            "/projects/1/issues",
+            f"/projects/{self.test_project_ids[0]}/issues",
             data=json.dumps(issue_data),
             content_type="application/json",
         )
@@ -358,23 +365,28 @@ def create_test_data():
         # Create three projects (ids 1 ,2, and 3)
         cur.execute(
             """
-            INSERT INTO projects (id, name, description)
+            INSERT INTO projects (name, description)
             VALUES
-                (1, 'Test Project 1', 'This is test project 1'),
-                (2, 'Test Project 2', 'This is test project 2'),
-                (3, 'Test Project 3', 'This is test project 3')
+                ('Test Project 1', 'This is test project 1'),
+                ('Test Project 2', 'This is test project 2'),
+                ('Test Project 3', 'This is test project 3')
             ON CONFLICT (id) DO NOTHING
         """
         )
+        # Commit the changes
+        conn.commit()
+
+        # Get the newly created project IDs
+        project_ids = get_test_project_ids()
 
         # Create three issues, one for each project (ids 1:1, 2:2, 3:3)
         cur.execute(
-            """
-            INSERT INTO issues (id, project_id, title, description)
+            f"""
+            INSERT INTO issues (project_id, title, description)
             VALUES
-                (1, 1, 'Test Issue 1 for Project 1', 'This is test issue 1 for project 1'),
-                (2, 2, 'Test Issue 2 for Project 2', 'This is test issue 2 for project 2'),
-                (3, 3, 'Test Issue 3 for Project 3', 'This is test issue 3 for project 3')
+                ({project_ids[0]}, 'Test Issue 1 for Project 1', 'This is test issue 1 for project 1'),
+                ({project_ids[1]}, 'Test Issue 2 for Project 2', 'This is test issue 2 for project 2'),
+                ({project_ids[2]}, 'Test Issue 3 for Project 3', 'This is test issue 3 for project 3')
             ON CONFLICT (id) DO NOTHING
         """
         )
@@ -388,6 +400,36 @@ def create_test_data():
     except psycopg2.Error as e:
         print(e)
         sys.exit(-1)
+
+
+def get_test_project_ids():
+    """
+    Returns a list of project IDs used by the tests.
+    """
+    conn = psycopg2.connect(POSTGRES_URL)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT * FROM projects WHERE name = 'Test Project 1' OR name = 'Test Project 2' OR name = 'Test Project 3'"
+    )
+    projects = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [project[0] for project in projects]
+
+
+def get_test_issue_ids():
+    """
+    Returns a list of issue IDs used by the tests.
+    """
+    conn = psycopg2.connect(POSTGRES_URL)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT * FROM issues WHERE title = 'Test Issue 1 for Project 1' OR title = 'Test Issue 2 for Project 2' OR title = 'Test Issue 3 for Project 3'"
+    )
+    issues = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [issue[0] for issue in issues]
 
 
 if __name__ == "__main__":
