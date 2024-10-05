@@ -1,0 +1,16 @@
+name: Static Website Build
+
+# On PR to main or nonprod
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  website-test:
+    name: Test the Static Website
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
