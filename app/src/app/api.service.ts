@@ -67,8 +67,8 @@ export class ApiService {
             return this.http.post(`${this.apiUrl}/projects`, project);
         }
         // If we are not running in a container, set data in local storage
-        let items: Project[] = this.getLocalStorageProjects();
-        let index = items.findIndex(item => item.id === project.id);
+        const items: Project[] = this.getLocalStorageProjects();
+        const index = items.findIndex(item => item.id === project.id);
         if (index === -1) {
             items.push(project);
             localStorage.setItem('projects', JSON.stringify(items));
@@ -84,8 +84,8 @@ export class ApiService {
             );
         }
         // If we are not running in a container, get data from local storage
-        let items: Project[] = this.getLocalStorageProjects();
-        let project = items.find(project => project.id === project_id);
+        const items: Project[] = this.getLocalStorageProjects();
+        const project = items.find(project => project.id === project_id);
         if (project) {
             return new Observable<Project>(observer => {
                 observer.next(project);
@@ -103,8 +103,8 @@ export class ApiService {
             return this.http.put(`${this.apiUrl}/projects/${project_id}`, value);
         }
         // If we are not running in a container, set data in local storage
-        let items: Project[] = this.getLocalStorageProjects();
-        let index = items.findIndex(project => project.id === project_id);
+        const items: Project[] = this.getLocalStorageProjects();
+        const index = items.findIndex(project => project.id === project_id);
         if (index !== -1) {
             items[index] = value;
             localStorage.setItem('projects', JSON.stringify(items));
@@ -118,8 +118,8 @@ export class ApiService {
             return this.http.delete(`${this.apiUrl}/projects/${project_id}`);
         }
         // If we are not running in a container, delete data from local storage
-        let items: Project[] = this.getLocalStorageProjects();
-        let index = items.findIndex(project => project.id === project_id);
+        const items: Project[] = this.getLocalStorageProjects();
+        const index = items.findIndex(project => project.id === project_id);
         if (index !== -1) {
             items.splice(index, 1);
             localStorage.setItem('projects', JSON.stringify(items));
@@ -135,8 +135,8 @@ export class ApiService {
             );
         }
         // If we are not running in a container, get data from local storage
-        let items: Issue[] = this.getLocalStorageIssues();
-        let issues = items.filter(issue => issue.project_id === project_id);
+        const items: Issue[] = this.getLocalStorageIssues();
+        const issues = items.filter(issue => issue.project_id === project_id);
         if (issues) {
             return new Observable<Issue[]>(observer => {
                 observer.next(issues);
@@ -155,8 +155,8 @@ export class ApiService {
             return this.http.post(`${this.apiUrl}/projects/${issue.project_id}/issues`, issue);
         }
         // If we are not running in a container, set data in local storage
-        let items: Issue[] = this.getLocalStorageIssues();
-        let index = items.findIndex(issue => issue.id === issue.id);
+        const items: Issue[] = this.getLocalStorageIssues();
+        const index = items.findIndex(issue => issue.id === issue.id);
         if (index === -1) {
             items.push(issue);
             localStorage.setItem('issues', JSON.stringify(items));
@@ -172,8 +172,8 @@ export class ApiService {
             );
         }
         // If we are not running in a container, get data from local storage
-        let items: Issue[] = this.getLocalStorageIssues();
-        let issue = items.find(issue => issue.id === issue_id);
+        const items: Issue[] = this.getLocalStorageIssues();
+        const issue = items.find(issue => issue.id === issue_id);
         if (issue) {
             return new Observable<Issue>(observer => {
                 observer.next(issue);
@@ -189,8 +189,8 @@ export class ApiService {
             return this.http.put(`${this.apiUrl}/issues/${issue_id}`, value);
         }
         // If we are not running in a container, set data in local storage
-        let items: Issue[] = this.getLocalStorageIssues();
-        let index = items.findIndex(issue => issue.id === issue_id);
+        const items: Issue[] = this.getLocalStorageIssues();
+        const index = items.findIndex(issue => issue.id === issue_id);
         if (index !== -1) {
             items[index] = value;
             localStorage.setItem('issues', JSON.stringify(items));
@@ -204,8 +204,8 @@ export class ApiService {
             return this.http.delete(`${this.apiUrl}/issues/${issue_id}`);
         }
         // If we are not running in a container, delete data from local storage
-        let items: Issue[] = this.getLocalStorageIssues();
-        let index = items.findIndex(issue => issue.id === issue_id);
+        const items: Issue[] = this.getLocalStorageIssues();
+        const index = items.findIndex(issue => issue.id === issue_id);
         if (index !== -1) {
             items.splice(index, 1);
             localStorage.setItem('issues', JSON.stringify(items));
