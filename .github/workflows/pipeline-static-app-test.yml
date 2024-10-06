@@ -1,15 +1,14 @@
-name: Angular Tester
+name: Test Static Website
 
+# On PR to main
 on:
   pull_request:
     branches:
       - main
-      - nonprod
 
 jobs:
-  test-js:
-    name: Test the Angular App
-
+  website-test:
+    name: Test the Static Website
     runs-on: ubuntu-latest
 
     steps:
@@ -27,20 +26,17 @@ jobs:
         cd app
         npm install
         npm install -g @angular/cli@17 > /dev/null 
-        
+
+    - name: Change IS_CONTAINERIZED to false
+      run: |
+        echo "export const IS_CONTAINERIZED = false" > ./app/src/app/is_containerized.ts
+
     - name: Test Angular app
       run: |
         cd app
         ng test --browsers=ChromeHeadless --watch=false
 
-    - name: Build Angular app for Dev
-      if: ${{ github.event.pull_request.base.ref == 'nonprod' }}
-      run: |
-        cd app
-        npm run ng build --dev
-
     - name: Build Angular app for Prod
-      if: ${{ github.event.pull_request.base.ref == 'main' }}
       run: |
         cd app
         npm run ng build --prod

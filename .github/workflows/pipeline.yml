@@ -33,6 +33,10 @@ jobs:
         npm install
         npm install -g @angular/cli@17 > /dev/null 
 
+    - name: Change IS_CONTAINERIZED to false
+      run: |
+        echo "export const IS_CONTAINERIZED = false" > ./app/src/app/is_containerized.ts
+
     - name: Build Angular app
       run: |
         cd app
