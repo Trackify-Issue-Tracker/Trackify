@@ -177,6 +177,7 @@ async def create_project():
 
         # Attempt operation
         try:
+            # add method to see if project already exists
             cur.execute(
                 "INSERT INTO projects (name, description) VALUES (%s, %s)",
                 (name, description),
