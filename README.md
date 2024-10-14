@@ -31,6 +31,7 @@ Trackify uses a PostgreSQL database to store project and issue data. The databas
 The Python API, built using the Flask framework, offers a RESTful interface for database interactions. It provides endpoints for creating, reading, updating, and deleting projects and issues, as well as for user authentication and authorization. The API is designed with security in mind, using SSL/TLS encryption to protect data in transit, and is scalable to handle high volumes of requests.
 
 The API has the following endpoints:
+
 - `/` : Root endpoint of the API
 - `/projects` : GET all project data stored in the database
 - `/projects` : POST (create) project
