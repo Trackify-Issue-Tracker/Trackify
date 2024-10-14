@@ -1,4 +1,5 @@
 # Trackify
+
 Trackify: An Issue Tracker
 
 Engineered to assist teams in efficiently managing and tracking issues across various projects.
@@ -8,9 +9,11 @@ Engineered to assist teams in efficiently managing and tracking issues across va
 
 
 ## Overview
+
 Trackify utilizes separate containers for its `PostgreSQL` database, `Python` `Flask` API, and `Angular` frontend hosted on `Nginx`. These components are interconnected via an internal network, ensuring the API and database are shielded from external access. For data persistence, the application communicates with the API over this internal network, which then interfaces with the database to securely store and retrieve data.
 
 ### Architecture
+
 Trackify is designed with containerization in mind, with each component running in its own Docker container, managed using Docker and Docker Compose. The app employs a microservices architecture, where each component communicates with others via RESTful APIs. Additionally, it follows a service-oriented architecture, with each component providing specific services to the others.
 
 The Docker Compose file, `docker-compose.yml`, is responsible for orchestrating the deployment of these containers. It defines the services, networks, and volumes required for the application to run. The frontend service builds the Angular frontend, the backend service builds the Python Flask API, and the postgres service sets up the PostgreSQL database.
@@ -20,32 +23,37 @@ The Dockerfile, `Dockerfile`, is used to build the Docker images for the fronten
 By using Docker and Docker Compose, Trackify can be easily deployed on any system that supports Docker, ensuring consistent and reproducible deployments across different environments.
 
 ### Database
+
 Trackify uses a PostgreSQL database to store project and issue data. The database is scalable and capable of handling large volumes of data. Its schema supports multiple projects and issues, with dedicated tables for each. The database is hosted in a separate container and is inaccessible from outside the Trackify network.
 
 ### API
+
 The Python API, built using the Flask framework, offers a RESTful interface for database interactions. It provides endpoints for creating, reading, updating, and deleting projects and issues, as well as for user authentication and authorization. The API is designed with security in mind, using SSL/TLS encryption to protect data in transit, and is scalable to handle high volumes of requests.
 
 The API has the following endpoints:
-- `/` - Root endpoint of the API
-- `/projects` - GET all project data stored in the database
-- `/projects` - POST (create) project
-- `/projects/{id}` - GET project data by ID
-- `/projects/{id}` - PUT (update) project data by ID
-- `/projects/{id}` - DELETE project data by ID
-- `/projects/{id}/issues` - GET all issues by project ID
-- `/projects/{id}/issues` - POST (create) issues by project ID
-- `/issues/{id}` - GET issue by issue ID
-- `/issues/{id}` - PUT (update) issue by issue ID
-- `/issues/{id}` - DELETE issue by issue ID
-- `/issues` - GET all issues' data stored in the database
+- `/` : Root endpoint of the API
+- `/projects` : GET all project data stored in the database
+- `/projects` : POST (create) project
+- `/projects/{id}` : GET project data by ID
+- `/projects/{id}` : PUT (update) project data by ID
+- `/projects/{id}` : DELETE project data by ID
+- `/projects/{id}/issues` : GET all issues by project ID
+- `/projects/{id}/issues` : POST (create) issues by project ID
+- `/issues/{id}` : GET issue by issue ID
+- `/issues/{id}` : PUT (update) issue by issue ID
+- `/issues/{id}` : DELETE issue by issue ID
+- `/issues` : GET all issues' data stored in the database
 
 ### Angular App
+
 The Angular app, built using the Angular framework, provides a user-friendly interface for interacting with the API. It features a dashboard for viewing projects and issues, and forms for creating and editing them. The app is responsive, suitable for use on desktops, laptops, and mobile devices. It is served through Nginx and uses a proxy to communicate with the API. The Angular app is hosted on an external network for Nginx, while sharing the same internal network as the API and database, ensuring secure data retrieval.
 
 #### Components
+
 - API Service: Responsible for using HTTP methods to work on data in the database through the Python API.
 
-# Project Setup
+## Project Setup
+
 To set up the Trackify project, follow these steps:
 
 1. Clone the repository: Clone the Trackify repository to your local machine using the following command:
@@ -65,6 +73,7 @@ To set up the Trackify project, follow these steps:
     ```bash
     docker-compose up
     ```
+    
     This will start the PostgreSQL database, Python API, and Angular app containers.
 
 4. Access the app: Open your web browser and navigate to http://localhost:5000 to access the Trackify app.
@@ -77,5 +86,6 @@ To set up the Trackify project, follow these steps:
 
 **That's it!** You have now set up and run the Trackify project.
 
-# License
+## License
+
 This project is licensed under the GNU General Public License v3.0. See the LICENSE file for more details.
