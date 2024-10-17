@@ -1,41 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ApiService, Project, Issue } from './api.service';
-
+import { ProjectsComponent } from './projects/projects.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  imports: [RouterOutlet, ProjectsComponent, CommonModule],
+  templateUrl: './navbar/navbar.component.ts',
+  styleUrl: './app.component.css',
 })
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AppComponent implements OnInit {
   title = 'app';
   issues: Issue[] = [];
   projects: Project[] = [];
+  newProjectName: string = '';
+  newProjectDescription: string = '';
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.getIssues();
     this.getProjects();
   }
 
-  ngOnDestroy(): void {
-
-  }
+  ngOnDestroy(): void {}
 
   createProject(): void {
     // Make the project
     const project: Project = {
       id: '', // doesn't get used
-      name: 'New Project',
-      description: 'This is a new project'
+      name: this.newProjectName,
+      description: this.newProjectDescription,
     };
     // Create it using the API
     this.apiService.createProject(project).subscribe(() => {
@@ -47,9 +48,11 @@ export class AppComponent implements OnInit {
   getProjects(): void {
     this.apiService.getAllProjects().subscribe({
       // completeHandler
-      complete: () => { },
+      complete: () => {},
       // errorHandler
-      error: (error) => { console.error(error); },
+      error: (error) => {
+        console.error(error);
+      },
       // nextHandler
       next: (projects: Project[]) => {
         this.projects = projects; // Update the projects array
@@ -64,7 +67,7 @@ export class AppComponent implements OnInit {
       id: '', // doesn't get used
       project_id: this.projects[0]['id'],
       title: 'New Issue',
-      description: 'This is a new issue'
+      description: 'This is a new issue',
     };
     // Create it using the API
     this.apiService.createIssue(issue).subscribe(() => {
@@ -79,12 +82,13 @@ export class AppComponent implements OnInit {
     //   this.issues = issues;
     // });
 
-
     this.apiService.getAllIssues().subscribe({
       // completeHandler
-      complete: () => { },
+      complete: () => {},
       // errorHandler
-      error: (error) => { console.error(error); },
+      error: (error) => {
+        console.error(error);
+      },
       // nextHandler
       next: (issues: Issue[]) => {
         this.issues = issues; // Update the projects array

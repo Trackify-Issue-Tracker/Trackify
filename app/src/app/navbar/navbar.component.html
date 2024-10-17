@@ -1,0 +1,47 @@
+<nav class="bg-gray-800 text-white w-64 min-h-screen flex flex-col">
+  <!-- Logo -->
+  <div class="p-4">
+    <h1 class="text-2xl font-bold">Logo</h1>
+  </div>
+
+  <!-- Navigation Items -->
+  <ul class="flex-grow">
+    <li
+      *ngFor="let item of navItems"
+      class="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+    >
+      <a class="flex items-center space-x-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            [attr.d]="item.icon"
+          />
+        </svg>
+        <span>{{ item.label }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- User Profile -->
+  <div class="p-4 border-t border-gray-700">
+    <div class="flex items-center space-x-4">
+      <img
+        src="https://via.placeholder.com/40"
+        alt="User avatar"
+        class="w-10 h-10 rounded-full"
+      />
+      <div>
+        <p class="font-semibold">John Doe</p>
+        <p class="text-sm text-gray-400"></p>
+      </div>
+    </div>
+  </div>
+</nav>

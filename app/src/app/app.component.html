@@ -1,4 +1,25 @@
 <div>
+  <div><h1>Project</h1></div>
+  <div>
+    <form action="/action_page.php">
+      <label for="fname">First name:</label><br />
+      <input type="text" id="fname" name="fname" value="John" /><br />
+      <label for="lname">Last name:</label><br />
+      <input type="text" id="lname" name="lname" value="Doe" /><br /><br />
+      <input type="submit" value="Submit" />
+    </form>
+  </div>
+</div>
+
+<input type="text" [(ngModel)]="newProjectName" placeholder="Project Name" />
+<input
+  type="text"
+  [(ngModel)]="newProjectDescription"
+  placeholder="Project Description"
+/>
+<button (click)="createProject()">Create Project</button>
+
+<div>
   <button (click)="createProject()">Create Project</button>
   <button (click)="createIssue()">Create Issue</button>
 
@@ -13,5 +34,4 @@
       {{ issue.title }}: {{ issue.description }}
     </li>
   </ul>
-
 </div>
