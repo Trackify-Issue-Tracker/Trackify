@@ -1,0 +1,42 @@
+name: Test Static Website
+
+# On PR to main
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  website-test:
+    name: Test the Static Website
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        cd app
+        npm install
+        npm install -g @angular/cli@17 > /dev/null 
+
+    - name: Change IS_CONTAINERIZED to false
+      run: |
+        echo "export const IS_CONTAINERIZED = false" > ./app/src/app/is_containerized.ts
+
+    - name: Test Angular app
+      run: |
+        cd app
+        ng test --browsers=ChromeHeadless --watch=false
+
+    - name: Build Angular app for Prod
+      run: |
+        cd app
+        npm run ng build --prod

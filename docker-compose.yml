@@ -1,0 +1,68 @@
+name: trackify
+services:
+  frontend:
+    container_name: frontend-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend-stage
+    image: trackify-frontend:v1.1
+    ports:
+      - "5000:5000"
+    depends_on:
+      - backend
+      - postgres
+    networks:
+      - frontend-network
+      - backend-network
+
+  backend:
+    container_name: backend-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend-stage
+    image: trackify-backend:v1.1
+    depends_on:
+      - postgres
+    environment:
+      # Format: postgres://user:password@host:port/database
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    networks:
+      - backend-network
+    #- FOR DEBUGGING -#
+    #   - frontend-network
+    # ports:
+    #   - "5001:5001"
+    #-----------------#
+
+
+  postgres:
+    container_name: database-container
+    image: postgres:17.0
+    hostname: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend-network
+    ## FOR DEBUGGING ##
+    # restart: unless-stopped
+    # ports:
+    #   - "5432:5432"
+    ###################
+
+volumes:
+  postgres_data:
+    name: postgres-data
+
+networks:
+  backend-network:
+    internal: true
+    name: backend-internal-network
+  frontend-network:
+    name: frontend-external-network
