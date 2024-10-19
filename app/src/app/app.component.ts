@@ -1,20 +1,21 @@
-import { Component, } from '@angular/core'; //OnInit
+import { Component } from '@angular/core'; //OnInit
 import { Injectable } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ApiService, Project, Issue } from './api.service';
-
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, CommonModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class AppComponent { // implements OnInit
+export class AppComponent {
+  // implements OnInit
   title = 'app';
   issues: Issue[] = [];
   projects: Project[] = [];
@@ -38,7 +39,7 @@ export class AppComponent { // implements OnInit
     const project: Project = {
       id: '', // doesn't get used
       name: 'New Project',
-      description: 'This is a new project'
+      description: 'This is a new project',
     };
     // Create it using the API
     this.apiService.createProject(project).subscribe(() => {
@@ -50,9 +51,11 @@ export class AppComponent { // implements OnInit
   getProjects(): void {
     this.apiService.getAllProjects().subscribe({
       // completeHandler
-      complete: () => { },
+      complete: () => {},
       // errorHandler
-      error: (error) => { console.error(error); },
+      error: (error) => {
+        console.error(error);
+      },
       // nextHandler
       next: (projects: Project[]) => {
         this.projects = projects; // Update the projects array
@@ -67,7 +70,7 @@ export class AppComponent { // implements OnInit
       id: '', // doesn't get used
       project_id: this.projects[0]['id'],
       title: 'New Issue',
-      description: 'This is a new issue'
+      description: 'This is a new issue',
     };
     // Create it using the API
     this.apiService.createIssue(issue).subscribe(() => {
@@ -82,12 +85,13 @@ export class AppComponent { // implements OnInit
     //   this.issues = issues;
     // });
 
-
     this.apiService.getAllIssues().subscribe({
       // completeHandler
-      complete: () => { },
+      complete: () => {},
       // errorHandler
-      error: (error) => { console.error(error); },
+      error: (error) => {
+        console.error(error);
+      },
       // nextHandler
       next: (issues: Issue[]) => {
         this.issues = issues; // Update the projects array
