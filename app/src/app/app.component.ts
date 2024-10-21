@@ -3,11 +3,20 @@ import { Injectable } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ApiService, Project, Issue } from './api.service';
 import { CommonModule } from '@angular/common';
+import { HoverNavBarComponent } from './hover-nav-bar/hover-nav-bar.component';
+import { ProjectlistComponent } from './projectlist/projectlist.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule],
+  imports: [
+    RouterOutlet,
+    CommonModule,
+    HoverNavBarComponent,
+    ProjectlistComponent,
+    FormsModule,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -15,6 +24,9 @@ import { CommonModule } from '@angular/common';
   providedIn: 'root',
 })
 export class AppComponent {
+  projectName: string = ''; // User input for project name
+  projectDescription: string = ''; // User input for project description
+
   // implements OnInit
   title = 'app';
   issues: Issue[] = [];
@@ -38,13 +50,16 @@ export class AppComponent {
     // Make the project
     const project: Project = {
       id: '', // doesn't get used
-      name: 'New Project',
-      description: 'This is a new project',
+      name: this.projectName,
+      description: this.projectDescription,
     };
     // Create it using the API
     this.apiService.createProject(project).subscribe(() => {
       // Refresh the project list
       this.getProjects();
+      this.projectName = '';
+      this.projectDescription = '';
+      console.log('test');
     });
   }
 

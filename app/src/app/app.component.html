@@ -1,16 +1,50 @@
-<div>
-  <button (click)="createProject()">Create Project</button>
-  <button (click)="createIssue()">Create Issue</button>
+<div class="flex">
+  <hoverbar />
+  <div class="flex-col">
+    <div class="flex">
+      <!-- Input for Project Name -->
+      <input
+        [(ngModel)]="projectName"
+        type="text"
+        placeholder="Project Name"
+        class="p-2 border border-gray-300 rounded-lg h-10"
+      />
 
-  <ul>
-    <li *ngFor="let project of projects">
-      {{ project.name }}: {{ project.description }}
-    </li>
-  </ul>
+      <!-- Input for Project Description -->
+      <input
+        [(ngModel)]="projectDescription"
+        type="text"
+        placeholder="Project Description"
+        class="p-2 border border-gray-300 rounded-lg h-10"
+      />
 
-  <ul>
-    <li *ngFor="let issue of issues">
-      {{ issue.title }}: {{ issue.description }}
-    </li>
-  </ul>
+      <!-- Button to Create Project -->
+      <div class="h-10">
+        <button
+          (click)="createProject()"
+          class="p-2 bg-blue-500 text-white rounded-lg flex items-center space-x-2"
+        >
+          <h1>Create Project</h1>
+          <svg viewBox="0 0 24 24" class="w-6 h-6">
+            <path
+              d="m11 11h-7.25c-.414 0-.75.336-.75.75s.336.75.75.75h7.25v7.25c0 .414.336.75.75.75s.75-.336.75-.75v-7.25h7.25c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-7.25v-7.25c0-.414-.336-.75-.75-.75s-.75.336-.75.75z"
+              fill-rule="nonzero"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <projectlist class="p-10" />
+    <ul>
+      <li *ngFor="let project of projects">
+        {{ project.name }}: {{ project.description }}
+      </li>
+    </ul>
+
+    <ul>
+      <li *ngFor="let issue of issues">
+        {{ issue.title }}: {{ issue.description }}
+      </li>
+    </ul>
+  </div>
 </div>
