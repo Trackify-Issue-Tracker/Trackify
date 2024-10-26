@@ -8,6 +8,8 @@ Trackify utilizes separate containers for its `PostgreSQL` database, `Python` AP
 
 Trackify is designed with containerization in mind, with each component running in its own Docker container, managed using Docker and Docker Compose. The app employs a microservices architecture, where each component communicates with others via RESTful APIs. Additionally, it follows a service-oriented architecture, with each component providing specific services to the others.
 
+![Arcchitecture Diagram](architecture.png)
+
 The Docker Compose file, `docker-compose.yml`, is responsible for orchestrating the deployment of these containers. It defines the services, networks, and volumes required for the application to run. The frontend service builds the Angular frontend, the backend service builds the Python Flask API, and the postgres service sets up the PostgreSQL database.
 
 The Dockerfile, `Dockerfile`, is used to build the Docker images for the frontend and backend services. The frontend Dockerfile uses Alpine Linux to keep the image size small, and it installs the necessary dependencies for building and running the Angular application. The backend Dockerfile sets up a Python virtual environment, installs the required packages, and copies the application code into the container.
@@ -46,6 +48,23 @@ The Angular app, built using the Angular framework, provides a user-friendly int
 - API Service: Responsible for using HTTP methods to work on data in the database through the Python API.
 
 ## Project Setup
+
+
+### Prerequisites
+
+- `Git`: Ensure [Git](https://git-scm.com/downloads) is installed and configured on your local machine.  You can check to see if the CLI is available by running the following command:
+
+    ```bash
+    git --version
+    ```
+
+- `Docker`: Ensure you have [Docker](https://www.docker.com/products/docker-desktop/) installed on your local machine. You can check to see if the CLI is available by running the following command:
+
+    ```bash
+    docker -v
+    ```
+
+### Setup
 
 To set up the Trackify project, follow these steps:
 
