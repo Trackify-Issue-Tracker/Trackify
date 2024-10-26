@@ -89,7 +89,7 @@ export class ApiService {
     reset(): Observable<object> {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, reset data from the API
-            return this.http.get<JsonResponse>(`${this.apiUrl}/reset`);
+            return this.http.delete<JsonResponse>(`${this.apiUrl}/reset`);
         }
         // If we are not running in a container, reset data from local storage
         localStorage.setItem('projects', JSON.stringify([]));
