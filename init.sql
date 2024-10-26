@@ -26,35 +26,3 @@ CREATE TABLE IF NOT EXISTS issues (
   labels VARCHAR(255),
   FOREIGN KEY (project_id) REFERENCES projects (id)
 );
-
-
--- export interface Project {
---     id?: string; // internal
---     name: string;
---     description?: string;
---     status: ItemStatus;
---     priority?: ItemPriority;
---     date_created: string;
---     date_started?: string;
---     date_closed?: string;
---     assigned_to?: Array<string>;
---     assigned_by?: Array<string>;
---     labels?: Array<string>;
--- }
-
--- export interface Issue {
---     id?: string; // internal
---     project_id: string;
---     title: string;
---     description?: string;
---     type: IssueType;
---     status: ItemStatus;
---     priority?: ItemPriority;
---     date_created: string;
---     date_started?: string; // when was this issue changed to in progress
---     date_due?: string;
---     date_closed?: string;
---     assigned_to?: Array<string>;
---     assigned_by?: Array<string>;
---     labels?: Array<string>;
--- }
