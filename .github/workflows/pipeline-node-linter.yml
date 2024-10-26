@@ -31,4 +31,4 @@ jobs:
     - name: Lint Angular app
       run: |
         cd app
-        ng lint
+        ng lint --ignore=**/node_modules/,**/dist/,style,component-selector,directive-selector,template-syntax

@@ -17,8 +17,6 @@ This test suite covers the following endpoints:
     Delete issue (/issues/{id})
 """
 
-# pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-public-methods, no-else-return, no-else-break
-
 # import os
 import sys
 import unittest

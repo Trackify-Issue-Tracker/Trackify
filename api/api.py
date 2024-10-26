@@ -23,7 +23,6 @@ API Endpoints:
 /reset - DELETE all data in the database
 """
 
-# pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-return-statements, no-else-return, no-else-break
 # TODO: add status, priority, and type field validation
 # TODO: check if project_id and issue_id are valid
 import os
