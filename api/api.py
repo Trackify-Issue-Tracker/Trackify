@@ -24,10 +24,12 @@ API Endpoints:
 """
 
 # pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-return-statements, no-else-return, no-else-break
-
+# TODO: add status, priority, and type field validation
+# TODO: check if project_id and issue_id are valid
 import os
 import psycopg2
 from flask import Flask, jsonify, request
+from datetime import datetime as dt
 
 
 POSTGRES_URL = os.environ["POSTGRES_URL"]
@@ -107,7 +109,22 @@ async def get_all_projects():
             rows = cur.fetchall()
             cur.close()
             conn.close()
-            return jsonify({"message": rows}), 200
+            # format the rows so that they in the form of a dict
+            formatted_rows = [
+                {
+                    "id": row[0],
+                    "name": row[1],
+                    "description": row[2],
+                    "status": row[3],
+                    "priority": row[4],
+                    "date_created": row[5],
+                    "date_started": row[6],
+                    "date_closed": row[7],
+                    "labels": row[8],
+                }
+                for row in rows
+            ]
+            return jsonify({"message": formatted_rows}), 200
         except psycopg2.Error as e:
             return (
                 jsonify(
@@ -152,35 +169,36 @@ async def create_project():
                 415,
             )
 
-        # Initialize variables
-        name = None
-        description = None
-
         # Validate the data provided
-        # Name field is required, throw error if not provided
-        if "name" in request_json:
-            name = request_json["name"]
-        else:
+        if "name" not in request_json or "status" not in request_json:
             return (
                 jsonify(
                     {
-                        "message": "Invalid request, no name provided. This is a required field"
+                        "message": "Invalid request. Please fill out required fields of name and status"
                     }
                 ),
                 400,
             )
-        # Description field is optional, get if available
-        if "description" in request_json:
-            description = request_json["description"]
-        else:
-            description = ""
+
+        # Initialize variables
+        data = {
+            "name": request_json["name"],
+            "status": request_json["status"],
+            "description": request_json.get("description"),
+            "priority": request_json.get("priority"),
+            "date_created": str(dt.now()),
+            "date_started": request_json.get("date_started"),
+            "date_closed": request_json.get("date_closed"),
+            "labels": request_json.get("labels"),
+        }
 
         # Attempt operation
         try:
             # add method to see if project already exists
             cur.execute(
-                "INSERT INTO projects (name, description) VALUES (%s, %s)",
-                (name, description),
+                "INSERT INTO projects (name, status, description, priority, date_created, date_started, date_closed, labels) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING *",
+                [value for value in data.values()],
             )
             conn.commit()
             row_delta = cur.rowcount
@@ -198,7 +216,7 @@ async def create_project():
             return (
                 jsonify(
                     {
-                        "message": f"An issue occured when trying to add the project: {str(e)}"
+                        "message": f"An issue occurred when trying to add the project: {str(e)}"
                     }
                 ),
                 500,
@@ -233,7 +251,18 @@ async def get_project_by_id(project_id):
             cur.close()
             conn.close()
             if row:
-                return jsonify({"message": row}), 200
+                formatted_row = {
+                    "id": row[0],
+                    "name": row[1],
+                    "description": row[2],
+                    "status": row[3],
+                    "priority": row[4],
+                    "date_created": row[5],
+                    "date_started": row[6],
+                    "date_closed": row[7],
+                    "labels": row[8],
+                }
+                return jsonify({"message": formatted_row}), 200
             else:
                 return jsonify({"message": "Project not found"}), 404
         except psycopg2.Error as e:
@@ -278,36 +307,48 @@ async def update_project_by_id(project_id):
             )
 
         # Initialize variables
-        name = None
-        description = None
-
-        # Get the data provided
-        if "name" in request_json:
-            name = request_json["name"]
-        if "description" in request_json:
-            description = request_json["description"]
+        data = {
+            "name": request_json.get("name"),
+            "description": request_json.get("description"),
+            "status": request_json.get("status"),
+            "priority": request_json.get("priority"),
+            "date_started": request_json.get("date_started"),
+            "date_closed": request_json.get("date_closed"),
+            "labels": request_json.get("labels"),
+        }
 
         # Attempt operation
         try:
             # Update specified parts
-            if name:
-                cur.execute(
-                    "UPDATE projects SET name = %s WHERE id = %s", (name, project_id)
-                )
-            if description:
-                cur.execute(
-                    "UPDATE projects SET description = %s WHERE id = %s",
-                    (description, project_id),
-                )
+            updates = []
+            args = []
+            for field, value in data.items():
+                if value is not None:
+                    updates.append(f"{field} = %s")
+                    args.append(value)
+            args.append(project_id)
+            if updates:
+                query = f"UPDATE projects SET {', '.join(updates)} WHERE id = %s"
+                cur.execute(query, args)
             conn.commit()
+            row_delta = cur.rowcount
             cur.close()
             conn.close()
-            return jsonify({"message": "Data updated successfully"}), 200
+
+            # Validate if the operation was successful
+            if row_delta == 1:
+                return jsonify({"message": "Data updated successfully"}), 200
+            elif row_delta > 1:
+                return jsonify({"message": "Multiple rows updated unexpectedly"}), 500
+            elif row_delta == 0:
+                return jsonify({"message": "Nothing was updated/ Not Found"}), 404
+            else:
+                return jsonify({"message": "Data was not updated successfully"}), 500
         except psycopg2.Error as e:
             return (
                 jsonify(
                     {
-                        "message": f"An issue occured when trying to get the project: {str(e)}"
+                        "message": f"An issue occurred when trying to update the project: {str(e)}"
                     }
                 ),
                 500,
@@ -315,10 +356,7 @@ async def update_project_by_id(project_id):
 
     # If database has connection or other error
     except psycopg2.Error as e:
-        return (
-            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
-            500,
-        )
+        return jsonify({"message": str(e)}), 500
 
 
 @app.route("/projects/<project_id>", methods=["DELETE"])
@@ -385,7 +423,24 @@ async def get_issues_by_project_id(project_id):
             rows = cur.fetchall()
             cur.close()
             conn.close()
-            return jsonify({"message": rows}), 200
+            formatted_rows = [
+                {
+                    "id": row[0],
+                    "project_id": row[1],
+                    "title": row[2],
+                    "type": row[3],
+                    "description": row[4],
+                    "status": row[5],
+                    "priority": row[6],
+                    "date_created": row[7],
+                    "date_started": row[8],
+                    "date_due": row[9],
+                    "date_closed": row[10],
+                    "labels": row[11],
+                }
+                for row in rows
+            ]
+            return jsonify({"message": formatted_rows}), 200
         except psycopg2.Error as e:
             return (
                 jsonify(
@@ -409,18 +464,20 @@ async def create_issue_by_project_id(project_id):
     """
     POST a new issue to the database by project ID.
 
-    Returns a JSON response with a status code of 200 if the operation is successful,
+    Returns a JSON response with a status code of 201 if the operation is successful,
+    or a status code of 400 with an error message if the request is invalid,
     or a status code of 500 with an error message if the operation fails.
 
-    :param id: ID of the project to be queried
+    :param project_id: ID of the project to be queried
     :param value: value of the issue to be created
     :return: JSON response with a message
     """
     try:
+        # Attempt to connect to the database
         conn = psycopg2.connect(POSTGRES_URL)
         cur = conn.cursor()
 
-        # Get issue data
+        # Get the issue data
         request_json = request.get_json(silent=True)
         if request_json is None:
             return (
@@ -428,34 +485,44 @@ async def create_issue_by_project_id(project_id):
                 415,
             )
 
-        # Initialize variables
-        title = None
-        description = None
-
         # Validate the data provided
-        # Title field is required, throw error if not provided
-        if "title" in request_json:
-            title = request_json["title"]
-        else:
+        if (
+            "title" not in request_json
+            or "type" not in request_json
+            or "status" not in request_json
+        ):
             return (
                 jsonify(
                     {
-                        "message": "Invalid request, no title provided. This is a required field"
+                        "message": "Invalid request. Please fill out required fields of title, type, and status"
                     }
                 ),
                 400,
             )
-        # Description field is optional, get if available
-        if "description" in request_json:
-            description = request_json["description"]
-        else:
-            description = ""
+
+        # Initialize variables
+        data = {
+            "title": request_json["title"],
+            "description": request_json.get("description"),
+            "type": request_json["type"],
+            "status": request_json["status"],
+            "priority": request_json.get("priority"),
+            "date_created": str(dt.now()),
+            "date_started": request_json.get("date_started"),
+            "date_due": request_json.get("date_due"),
+            "date_closed": request_json.get("date_closed"),
+            "labels": request_json.get("labels"),
+            "project_id": project_id,
+        }
 
         # Attempt operation
         try:
+            # add method to see if issue already exists
+            args = [value for value in data.values()]
             cur.execute(
-                "INSERT INTO issues (project_id, title, description) VALUES (%s, %s, %s)",
-                (project_id, title, description),
+                "INSERT INTO issues (title, description, type, status, priority, date_created, date_started, date_due, date_closed, labels, project_id) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *",
+                args,
             )
             conn.commit()
             row_delta = cur.rowcount
@@ -473,17 +540,15 @@ async def create_issue_by_project_id(project_id):
             return (
                 jsonify(
                     {
-                        "message": f"An error occurred while trying to create an issue: {str(e)}"
+                        "message": f"An issue occurred when trying to add the issue: {str(e)}"
                     }
                 ),
                 500,
             )
 
+    # If database has connection or other error
     except psycopg2.Error as e:
-        return (
-            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
-            500,
-        )
+        return jsonify({"message": str(e)}), 500
 
 
 @app.route("/issues/<issue_id>", methods=["GET"])
@@ -513,7 +578,21 @@ async def get_issue_by_id(issue_id):
             cur.close()
             conn.close()
             if row:
-                return jsonify({"message": row}), 200
+                formatted_row = {
+                    "id": row[0],
+                    "project_id": row[1],
+                    "title": row[2],
+                    "type": row[3],
+                    "description": row[4],
+                    "status": row[5],
+                    "priority": row[6],
+                    "date_created": row[7],
+                    "date_started": row[8],
+                    "date_due": row[9],
+                    "date_closed": row[10],
+                    "labels": row[11],
+                }
+                return jsonify({"message": formatted_row}), 200
             else:
                 return jsonify({"message": "Issue not found"}), 404
         except psycopg2.Error as e:
@@ -540,9 +619,9 @@ async def update_issue_by_id(issue_id):
     PUT an issue to the database by ID.
 
     Returns a JSON response with a status code of 200 if the operation is successful,
+    or a status code of 400 with an error message if the request is invalid,
     or a status code of 500 with an error message if the operation fails.
 
-    :param id: ID of the project to be queried
     :param issue_id: ID of the issue to be updated
     :param value: value of the issue to be updated
     :return: JSON response with a message
@@ -552,7 +631,7 @@ async def update_issue_by_id(issue_id):
         conn = psycopg2.connect(POSTGRES_URL)
         cur = conn.cursor()
 
-        # Get issue data
+        # Get the issue data
         request_json = request.get_json(silent=True)
         if request_json is None:
             return (
@@ -561,46 +640,53 @@ async def update_issue_by_id(issue_id):
             )
 
         # Initialize variables
-        title = None
-        description = None
-        project_id = None
-
-        # Get the data provided
-        # Title field is required, throw error if not provided
-        if "project_id" in request_json:
-            project_id = request_json["project_id"]
-        if "title" in request_json:
-            title = request_json["title"]
-        if "description" in request_json:
-            description = request_json["description"]
+        data = {
+            "title": request_json.get("title"),
+            "description": request_json.get("description"),
+            "type": request_json.get("type"),
+            "status": request_json.get("status"),
+            "priority": request_json.get("priority"),
+            "date_started": request_json.get("date_started"),
+            "date_due": request_json.get("date_due"),
+            "date_closed": request_json.get("date_closed"),
+            "labels": request_json.get("labels"),
+            "project_id": request_json.get("project_id"),
+        }
 
         # Attempt operation
         try:
             # Update specified parts
-            if project_id:
+            updates = []
+            args = []
+            for field, value in data.items():
+                if value is not None:
+                    updates.append(f"{field} = %s")
+                    args.append(value)
+            args.append(issue_id)
+            if updates:
                 cur.execute(
-                    "UPDATE issues SET project_id = %s WHERE id = %s",
-                    (project_id, issue_id),
+                    f"UPDATE issues SET {', '.join(updates)} WHERE id = %s",
+                    args,
                 )
-            if title:
-                cur.execute(
-                    "UPDATE issues SET title = %s WHERE id = %s", (title, issue_id)
-                )
-            if description:
-                cur.execute(
-                    "UPDATE issues SET description = %s WHERE id = %s",
-                    (description, issue_id),
-                )
-
             conn.commit()
+            row_delta = cur.rowcount
             cur.close()
             conn.close()
-            return jsonify({"message": "Data updated successfully"}), 200
+
+            # Validate if the operation was successful
+            if row_delta == 1:
+                return jsonify({"message": "Data updated successfully"}), 200
+            elif row_delta > 1:
+                return jsonify({"message": "Multiple rows updated unexpectedly"}), 500
+            elif row_delta == 0:
+                return jsonify({"message": "Nothing was updated/ Not Found"}), 404
+            else:
+                return jsonify({"message": "Data was not updated successfully"}), 500
         except psycopg2.Error as e:
             return (
                 jsonify(
                     {
-                        "message": f"An issue occured when trying to update the issue: {str(e)}"
+                        "message": f"An issue occurred when trying to update the issue: {str(e)}"
                     }
                 ),
                 500,
@@ -608,10 +694,7 @@ async def update_issue_by_id(issue_id):
 
     # If database has connection or other error
     except psycopg2.Error as e:
-        return (
-            jsonify({"message": f"A connection or other issue occured: {str(e)}"}),
-            500,
-        )
+        return jsonify({"message": str(e)}), 500
 
 
 @app.route("/issues/<issue_id>", methods=["DELETE"])
@@ -677,7 +760,24 @@ async def get_all_issues():
             rows = cur.fetchall()
             cur.close()
             conn.close()
-            return jsonify({"message": rows}), 200
+            formatted_rows = [
+                {
+                    "id": row[0],
+                    "project_id": row[1],
+                    "title": row[2],
+                    "type": row[3],
+                    "description": row[4],
+                    "status": row[5],
+                    "priority": row[6],
+                    "date_created": row[7],
+                    "date_started": row[8],
+                    "date_due": row[9],
+                    "date_closed": row[10],
+                    "labels": row[11],
+                }
+                for row in rows
+            ]
+            return jsonify({"message": formatted_rows}), 200
         except psycopg2.Error as e:
             return (
                 jsonify(
