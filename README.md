@@ -1,8 +1,8 @@
-# Trackify
+# Trackify: An Issue Tracker
 
 ## Overview
 
-Trackify utilizes separate containers for its `PostgreSQL` database, `Python` `Flask` API, and `Angular` frontend hosted on `Nginx`. These components are interconnected via an internal network, ensuring the API and database are shielded from external access. For data persistence, the application communicates with the API over this internal network, which then interfaces with the database to securely store and retrieve data.
+Trackify utilizes separate containers for its `PostgreSQL` database, `Python` API made using `Flask`, and `Angular` frontend hosted on `NgInx`. These components are interconnected via an internal network, ensuring the API and database are shielded from external access. For data persistence, the application communicates with the API over this internal network, which then interfaces with the database to securely store and retrieve data.
 
 ### Architecture
 

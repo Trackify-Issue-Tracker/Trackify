@@ -9,17 +9,56 @@ import { map } from 'rxjs';
 import { IS_CONTAINERIZED } from './is_containerized';
 
 
+// Enums for Status, Priority, and Type
+export enum ItemStatus {
+    New = 'New',
+    Approved = 'Approved',
+    InProgress = 'In progress',
+    Done = 'Done',
+    Closed = 'Closed'
+}
+export enum ItemPriority {
+    Low = 'Low',
+    Medium = 'Medium',
+    High = 'High',
+    Critical = 'Critical'
+}
+export enum ItemType {
+    Bug = 'Bug',
+    Task = 'Task',
+    Improvement = 'Improvement',
+    Feature = 'Feature',
+    Other = 'Other'
+}
+
+
+// Interfaces for Project and Issuea
+// ID and DATE_CREATED won't be changed even if provided since they are configured internally
 export interface Project {
-    id: string;
+    id?: string;
     name: string;
-    description: string;
+    description?: string;
+    status: ItemStatus;
+    priority?: ItemPriority;
+    date_created?: string;
+    date_started?: string;
+    date_closed?: string;
+    labels?: Array<string>;
 }
 
 export interface Issue {
-    id: string;
+    id?: string;
     project_id: string;
     title: string;
-    description: string;
+    description?: string;
+    type: ItemType;
+    status: ItemStatus;
+    priority?: ItemPriority;
+    date_created?: string;
+    date_started?: string; // when was this issue changed to in progress
+    date_due?: string;
+    date_closed?: string;
+    labels?: Array<string>;
 }
 
 interface JsonResponse {
@@ -47,6 +86,20 @@ export class ApiService {
         }
     }
 
+    reset(): Observable<object> {
+        if (IS_CONTAINERIZED) {
+            // If we are running in a container, reset data from the API
+            return this.http.delete<JsonResponse>(`${this.apiUrl}/reset`);
+        }
+        // If we are not running in a container, reset data from local storage
+        localStorage.setItem('projects', JSON.stringify([]));
+        localStorage.setItem('issues', JSON.stringify([]));
+        return new Observable(observer => {
+            observer.next();
+            observer.complete();
+        });
+    }
+
     getAllProjects(): Observable<Project[]> {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, get data from the API
@@ -68,12 +121,15 @@ export class ApiService {
         }
         // If we are not running in a container, set data in local storage
         const items: Project[] = this.getLocalStorageProjects();
-        const index = items.findIndex(item => item.id === project.id);
-        if (index === -1) {
-            items.push(project);
-            localStorage.setItem('projects', JSON.stringify(items));
-        }
-        return new Observable();
+        const maxId = items.length > 0 ? Math.max(...items.map(item => Number(item.id))) : 0;
+        project.id = (maxId + 1).toString();
+        items.push(project);
+        localStorage.setItem('projects', JSON.stringify(items));
+
+        return new Observable(observer => {
+            observer.next();
+            observer.complete();
+        });
     }
 
     getProject(project_id: string): Observable<Project> {
@@ -92,10 +148,11 @@ export class ApiService {
                 observer.complete();
             });
         }
-        return new Observable<Project>();
+        return new Observable<Project>(observer => {
+            observer.next();
+            observer.complete();
+        });
     }
-
-
 
     updateProject(project_id: string, value: Project): Observable<object> {
         if (IS_CONTAINERIZED) {
@@ -106,10 +163,22 @@ export class ApiService {
         const items: Project[] = this.getLocalStorageProjects();
         const index = items.findIndex(project => project.id === project_id);
         if (index !== -1) {
-            items[index] = value;
+            const current = items[index];
+            // Update only the fields that were provided
+            current.status = value.status ?? current.status;
+            current.name = value.name ?? current.name;
+            current.description = value.description ?? current.description;
+            current.priority = value.priority ?? current.priority;
+            current.labels = value.labels ?? current.labels;
+            current.date_started = value.date_started ?? current.date_started;
+            current.date_closed = value.date_closed ?? current.date_closed;
+            items[index] = current;
             localStorage.setItem('projects', JSON.stringify(items));
         }
-        return new Observable();
+        return new Observable(observer => {
+            observer.next();
+            observer.complete();
+        });
     }
 
     deleteProject(project_id: string): Observable<object> {
@@ -124,7 +193,10 @@ export class ApiService {
             items.splice(index, 1);
             localStorage.setItem('projects', JSON.stringify(items));
         }
-        return new Observable();
+        return new Observable(observer => {
+            observer.next();
+            observer.complete();
+        });
     }
 
     getAllIssuesOfProject(project_id: string): Observable<Issue[]> {
@@ -155,13 +227,19 @@ export class ApiService {
             return this.http.post(`${this.apiUrl}/projects/${issue.project_id}/issues`, issue);
         }
         // If we are not running in a container, set data in local storage
-        const items: Issue[] = this.getLocalStorageIssues();
-        const index = items.findIndex(issue => issue.id === issue.id);
-        if (index === -1) {
+        const projects: Project[] = this.getLocalStorageProjects();
+        const project_index = projects.findIndex(project => project.id === issue.project_id);
+        if (project_index !== -1) {
+            const items: Issue[] = this.getLocalStorageIssues();
+            const maxId = items.length > 0 ? Math.max(...items.map(item => Number(item.id))) : 0;
+            issue.id = (maxId + 1).toString();
             items.push(issue);
             localStorage.setItem('issues', JSON.stringify(items));
         }
-        return new Observable();
+        return new Observable(observer => {
+            observer.next();
+            observer.complete();
+        });
     }
 
     getIssue(issue_id: string): Observable<Issue> {
@@ -180,7 +258,10 @@ export class ApiService {
                 observer.complete();
             });
         }
-        return new Observable<Issue>();
+        return new Observable<Issue>(observer => {
+            observer.next();
+            observer.complete();
+        });
     }
 
     updateIssue(issue_id: string, value: Issue): Observable<object> {
@@ -192,10 +273,25 @@ export class ApiService {
         const items: Issue[] = this.getLocalStorageIssues();
         const index = items.findIndex(issue => issue.id === issue_id);
         if (index !== -1) {
+            const current = items[index];
+            // Update only the fields that were provided
+            current.title = value.title ?? current.title;
+            current.description = value.description ?? current.description;
+            current.status = value.status ?? current.status;
+            current.priority = value.priority ?? current.priority;
+            current.date_closed = value.date_closed ?? current.date_closed;
+            current.date_started = value.date_started ?? current.date_started;
+            current.date_due = value.date_due ?? current.date_due;
+            current.project_id = value.project_id ?? current.project_id;
+            current.labels = value.labels ?? current.labels;
+
             items[index] = value;
             localStorage.setItem('issues', JSON.stringify(items));
         }
-        return new Observable();
+        return new Observable(observer => {
+            observer.next();
+            observer.complete();
+        });
     }
 
     deleteIssue(issue_id: string): Observable<object> {
@@ -210,7 +306,10 @@ export class ApiService {
             items.splice(index, 1);
             localStorage.setItem('issues', JSON.stringify(items));
         }
-        return new Observable();
+        return new Observable(observer => {
+            observer.next();
+            observer.complete();
+        });
     }
 
     getAllIssues(): Observable<Issue[]> {

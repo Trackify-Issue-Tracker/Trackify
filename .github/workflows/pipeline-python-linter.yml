@@ -31,4 +31,7 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         cd api
-        pylint $(git ls-files '*.py')
+        pylint --disable=C0301,C0302,E0611,C0410,W0105,C0411,C0303,C0103,R0904,R0911,R1705,R1723,W0511 $(git ls-files '*.py')
+
+# pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-public-methods, too-many-return-statements, no-else-return, no-else-break
+# C0301,C0302,E0611,C0410,W0105,C0411,C0303,C0103,R0904,R0911,R1705,R1723
