@@ -8,7 +8,7 @@ Trackify utilizes separate containers for its `PostgreSQL` database, `Python` AP
 
 Trackify is designed with containerization in mind, with each component running in its own Docker container, managed using Docker and Docker Compose. The app employs a microservices architecture, where each component communicates with others via RESTful APIs. Additionally, it follows a service-oriented architecture, with each component providing specific services to the others.
 
-![Arcchitecture Diagram](architecture.png)
+![Arcchitecture Diagram](https://raw.githubusercontent.com/Trackify-Issue-Tracker/Trackify/main/architecture.png)
 
 The Docker Compose file, `docker-compose.yml`, is responsible for orchestrating the deployment of these containers. It defines the services, networks, and volumes required for the application to run. The frontend service builds the Angular frontend, the backend service builds the Python Flask API, and the postgres service sets up the PostgreSQL database.
 
