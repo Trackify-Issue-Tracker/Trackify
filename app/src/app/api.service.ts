@@ -121,7 +121,7 @@ export class ApiService {
         }
         // If we are not running in a container, set data in local storage
         const items: Project[] = this.getLocalStorageProjects();
-        let maxId = items.length > 0 ? Math.max(...items.map(item => Number(item.id))) : 0;
+        const maxId = items.length > 0 ? Math.max(...items.map(item => Number(item.id))) : 0;
         project.id = (maxId + 1).toString();
         items.push(project);
         localStorage.setItem('projects', JSON.stringify(items));
@@ -163,7 +163,7 @@ export class ApiService {
         const items: Project[] = this.getLocalStorageProjects();
         const index = items.findIndex(project => project.id === project_id);
         if (index !== -1) {
-            let current = items[index];
+            const current = items[index];
             // Update only the fields that were provided
             current.status = value.status ?? current.status;
             current.name = value.name ?? current.name;
@@ -231,7 +231,7 @@ export class ApiService {
         const project_index = projects.findIndex(project => project.id === issue.project_id);
         if (project_index !== -1) {
             const items: Issue[] = this.getLocalStorageIssues();
-            let maxId = items.length > 0 ? Math.max(...items.map(item => Number(item.id))) : 0;
+            const maxId = items.length > 0 ? Math.max(...items.map(item => Number(item.id))) : 0;
             issue.id = (maxId + 1).toString();
             items.push(issue);
             localStorage.setItem('issues', JSON.stringify(items));
@@ -273,7 +273,7 @@ export class ApiService {
         const items: Issue[] = this.getLocalStorageIssues();
         const index = items.findIndex(issue => issue.id === issue_id);
         if (index !== -1) {
-            let current = items[index];
+            const current = items[index];
             // Update only the fields that were provided
             current.title = value.title ?? current.title;
             current.description = value.description ?? current.description;
