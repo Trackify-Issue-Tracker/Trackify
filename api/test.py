@@ -17,15 +17,13 @@ This test suite covers the following endpoints:
     Delete issue (/issues/{id})
 """
 
-# pylint: disable = line-too-long, too-many-lines, no-name-in-module, multiple-imports, pointless-string-statement, wrong-import-order, trailing-whitespace, invalid-name, too-many-public-methods, no-else-return, no-else-break
-
 # import os
 import sys
 import unittest
 import json
 import psycopg2
 from api import app, POSTGRES_URL
-
+from datetime import datetime as dt
 
 # POSTGRES_URL = os.environ["POSTGRES_URL"]
 
@@ -102,7 +100,12 @@ class TestAPI(unittest.TestCase):
         with a message indicating that the data was added successfully when given valid data.
         """
         # Create a project
-        project_data = {"name": "Test Project", "description": "This is a test project"}
+        project_data = {
+            "name": "Test Project",
+            "description": "This is a test project",
+            "status": "New",
+            "priority": "High",
+        }
         response = self.app.post(
             "/projects", data=json.dumps(project_data), content_type="application/json"
         )
@@ -130,8 +133,8 @@ class TestAPI(unittest.TestCase):
         response = self.app.get(f"/projects/{self.test_project_ids[0]}")
         # Test
         self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.json["message"], list)
-        self.assertEqual(response.json["message"][0], self.test_project_ids[0])
+        self.assertIsInstance(response.json["message"], dict)
+        self.assertEqual(response.json["message"]["id"], self.test_project_ids[0])
 
     def test_update_project(self):
         """
@@ -141,7 +144,7 @@ class TestAPI(unittest.TestCase):
         # Call
         project_data = {
             "name": "Updated Test Project 1",
-            "description": "This is an updated test Project 1",
+            "status": "Closed",
         }
         response = self.app.put(
             f"/projects/{self.test_project_ids[0]}",
@@ -153,7 +156,7 @@ class TestAPI(unittest.TestCase):
         # Test
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["message"], "Data updated successfully")
-        self.assertEqual(response_updated.json["message"][1], "Updated Test Project 1")
+        self.assertEqual(response_updated.json["message"]["status"], "Closed")
 
     def test_delete_project(self):
         """
@@ -179,7 +182,13 @@ class TestAPI(unittest.TestCase):
         with a message indicating that the data was added successfully when given valid data.
         """
         # Call
-        issue_data = {"title": "Test Issue", "description": "This is a test issue"}
+        issue_data = {
+            "title": "Test Issue",
+            "description": "This is a test issue",
+            "type": "Bug",
+            "status": "New",
+            "priority": "Low",
+        }
         response = self.app.post(
             f"/projects/{self.test_project_ids[0]}/issues",
             data=json.dumps(issue_data),
@@ -199,7 +208,9 @@ class TestAPI(unittest.TestCase):
         # Test
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.json["message"], list)
-        self.assertEqual(response.json["message"][0][1], self.test_project_ids[0])
+        self.assertEqual(
+            response.json["message"][0]["project_id"], self.test_project_ids[0]
+        )
 
     def test_get_issues(self):
         """
@@ -221,8 +232,8 @@ class TestAPI(unittest.TestCase):
         response = self.app.get(f"/issues/{self.test_issue_ids[0]}")
         # Test
         self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.json["message"], list)
-        self.assertEqual(response.json["message"][0], self.test_issue_ids[0])
+        self.assertIsInstance(response.json["message"], dict)
+        self.assertEqual(response.json["message"]["id"], self.test_issue_ids[0])
 
     def test_update_issue(self):
         """
@@ -245,7 +256,8 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["message"], "Data updated successfully")
         self.assertEqual(
-            response_updated.json["message"][2], "Updated Test Issue 1 for Project 1"
+            response_updated.json["message"]["title"],
+            "Updated Test Issue 1 for Project 1",
         )
 
     def test_delete_issue(self):
@@ -364,12 +376,12 @@ def create_test_data():
 
         # Create three projects (ids 1 ,2, and 3)
         cur.execute(
-            """
-            INSERT INTO projects (name, description)
+            f"""
+            INSERT INTO projects (name, description, status, date_created)
             VALUES
-                ('Test Project 1', 'This is test project 1'),
-                ('Test Project 2', 'This is test project 2'),
-                ('Test Project 3', 'This is test project 3')
+                ('Test Project 1', 'This is test project 1', 'New', '{dt.now()}'),
+                ('Test Project 2', 'This is test project 2', 'New', '{dt.now()}'),
+                ('Test Project 3', 'This is test project 3', 'New', '{dt.now()}')
             ON CONFLICT (id) DO NOTHING
         """
         )
@@ -382,11 +394,11 @@ def create_test_data():
         # Create three issues, one for each project (ids 1:1, 2:2, 3:3)
         cur.execute(
             f"""
-            INSERT INTO issues (project_id, title, description)
+            INSERT INTO issues (project_id, title, description, type, status, date_created)
             VALUES
-                ({project_ids[0]}, 'Test Issue 1 for Project 1', 'This is test issue 1 for project 1'),
-                ({project_ids[1]}, 'Test Issue 2 for Project 2', 'This is test issue 2 for project 2'),
-                ({project_ids[2]}, 'Test Issue 3 for Project 3', 'This is test issue 3 for project 3')
+                ({project_ids[0]}, 'Test Issue 1 for Project 1', 'This is test issue 1 for project 1', 'Bug', 'New', '{dt.now()}'),
+                ({project_ids[1]}, 'Test Issue 2 for Project 2', 'This is test issue 2 for project 2', 'Bug', 'New', '{dt.now()}'),
+                ({project_ids[2]}, 'Test Issue 3 for Project 3', 'This is test issue 3 for project 3', 'Bug', 'New', '{dt.now()}')
             ON CONFLICT (id) DO NOTHING
         """
         )
