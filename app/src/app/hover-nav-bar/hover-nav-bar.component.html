@@ -3,12 +3,12 @@
 >
   <div
     *ngFor="let navItem of navigation"
-    class="col-span-1 row-span-1 flex items-center justify-start relative pl-2"
+    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 bg-blues-4 rounded-md"
   >
     <a
       [href]="navItem.url"
       [id]="navItem.id"
-      class="text-center text-main-2 flex items-center space-x-2"
+      class="text-center text-main-1 flex items-center space-x-2"
     >
       <svg
         viewBox="0 0 24 24"
@@ -23,14 +23,15 @@
       <span class="absolute left-16 text-main-2">{{ navItem.title }}</span>
     </a>
   </div>
+  <div class="col-span-1 row-span-6"></div>
   <div
-    class="col-span-1 row-span-1 flex items-center justify-start relative pl-2"
+    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 bg-blues-4 rounded-md"
     (click)="openSettingsBox()"
   >
-    <div class="text-center text-main-2 flex items-center space-x-2">
+    <div class="text-center text-main-1 flex items-center space-x-2">
       <svg
         viewBox="0 0 24 24"
-        class="w-6 h-6 flex-shrink-0 text-main-2"
+        class="w-6 h-6 flex-shrink-0 text-main-1"
         fill="currentColor"
       >
         <path

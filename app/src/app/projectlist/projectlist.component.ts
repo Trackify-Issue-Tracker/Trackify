@@ -13,7 +13,12 @@ import { FormsModule } from '@angular/forms';
 export class ProjectlistComponent {
   projectName: string = ''; // User input for project name
   projectDescription: string = ''; // User input for project description
+  // Add this property
+  showInputs = false;
 
+  toggleInputs() {
+    this.showInputs = !this.showInputs;
+  }
   // implements OnInit
   title = 'app';
   issues: Issue[] = [];
@@ -47,15 +52,20 @@ export class ProjectlistComponent {
 
   createProject(): void {
     // Make the project
+
     const project: Project = {
-      id: '', // doesn't get used
-      name: 'New Project',
-      description: 'This is a new project',
+      id: '1', // doesn't get used
+      name: this.projectName,
+      description: this.projectDescription,
     };
+
     // Create it using the API
     this.apiService.createProject(project).subscribe(() => {
       // Refresh the project list
+
       this.getProjects();
+      this.projectName = '';
+      this.projectDescription = '';
     });
   }
 
