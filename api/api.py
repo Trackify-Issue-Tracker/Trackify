@@ -197,7 +197,7 @@ async def create_project():
             cur.execute(
                 "INSERT INTO projects (name, status, description, priority, date_created, date_started, date_closed, labels) \
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING *",
-                data.values(),
+                list(data.values()),
             )
             conn.commit()
             row_delta = cur.rowcount
@@ -520,7 +520,7 @@ async def create_issue_by_project_id(project_id):
             cur.execute(
                 "INSERT INTO issues (title, description, type, status, priority, date_created, date_started, date_due, date_closed, labels, project_id) \
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *",
-                data.values(),
+                list(data.values()),
             )
             conn.commit()
             row_delta = cur.rowcount
