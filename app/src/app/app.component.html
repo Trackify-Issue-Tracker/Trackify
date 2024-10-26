@@ -1,17 +1,6 @@
 <div>
+  <button (click)="deleteAll()">Reset</button>
   <button (click)="createProject()">Create Project</button>
   <button (click)="createIssue()">Create Issue</button>
-
-  <ul>
-    <li *ngFor="let project of projects">
-      {{ project.name }}: {{ project.description }}
-    </li>
-  </ul>
-
-  <ul>
-    <li *ngFor="let issue of issues">
-      {{ issue.title }}: {{ issue.description }}
-    </li>
-  </ul>
-
+  <button (click)="updateProject()">Update Project</button>
 </div>
