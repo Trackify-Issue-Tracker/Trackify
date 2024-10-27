@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { HoverNavBarComponent } from './hover-nav-bar/hover-nav-bar.component';
 import { ProjectlistComponent } from './projectlist/projectlist.component';
 import { FormsModule } from '@angular/forms';
+import { InfoBarComponent } from './info-bar/info-bar.component';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,7 @@ import { FormsModule } from '@angular/forms';
     HoverNavBarComponent,
     ProjectlistComponent,
     FormsModule,
+    InfoBarComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',

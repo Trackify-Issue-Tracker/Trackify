@@ -1,5 +1,12 @@
 import { Component } from '@angular/core';
-import { ApiService, Project, Issue } from '../api.service';
+import {
+  ApiService,
+  Project,
+  Issue,
+  ItemStatus,
+  ItemType,
+  ItemPriority,
+} from '../api.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -11,6 +18,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './projectlist.component.css',
 })
 export class ProjectlistComponent {
+  public ItemStatus = ItemStatus;
+  public ItemPriority = ItemPriority;
   projectName: string = ''; // User input for project name
   projectDescription: string = ''; // User input for project description
   // Add this property
@@ -55,8 +64,10 @@ export class ProjectlistComponent {
 
     const project: Project = {
       id: '1', // doesn't get used
+      status: ItemStatus.InProgress,
       name: this.projectName,
       description: this.projectDescription,
+      priority: ItemPriority.Low,
     };
 
     // Create it using the API

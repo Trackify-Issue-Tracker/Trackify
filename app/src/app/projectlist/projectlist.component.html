@@ -62,6 +62,7 @@
                 <path
                   d="m11 11h-7.25c-.414 0-.75.336-.75.75s.336.75.75.75h7.25v7.25c0 .414.336.75.75.75s.75-.336.75-.75v-7.25h7.25c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-7.25v-7.25c0-.414-.336-.75-.75-.75s-.75.336-.75.75z"
                   fill-rule="nonzero"
+                  fill="currentColor"
                 />
               </svg>
             </button>
@@ -71,7 +72,7 @@
 
       <!-- Filtered Projects -->
       <div
-        *ngFor="let project of filteredProjects"
+        *ngFor="let project of filteredProjects; let i = index"
         class="col-span-1 row-span-1 grid grid-cols-8 grid-rows-2 p-2 overflow-hidden bg-white border-b border-blue-3 hover:bg-main-1 transition-all duration-300"
       >
         <div
@@ -80,7 +81,7 @@
           <div
             class="border border-blues-3 w-[2.5rem] h-[2.5rem] rounded-md flex items-center justify-center"
           >
-            <h1 class="text-blues-3">0{{ project.id }}</h1>
+            <h1 class="text-blues-3">0 {{ i + 1 }}</h1>
           </div>
         </div>
         <div class="row-span-2 col-span-1">
@@ -91,13 +92,48 @@
             <h1 class="text-main-2">{{ project.name }}</h1>
           </div>
         </div>
-        <div class="row-span-2 col-span-5 border-r-2 border-l-2">
-          <div class="col-span-5 row-span-1 justify-center flex">
+        <!-- <div class="row-span-2 col-span-1 border-r-2 border-l-2">
+          <div class="col-span-1 row-span-1 justify-center flex">
             <h1 class="text-main-3">Description</h1>
           </div>
-          <div class="col-span-5 row-span-1 justify-center flex">
+          <div class="col-span-1 row-span-1 justify-center flex">
             <h1 class="text-main-2">
               {{ project.description }}
+            </h1>
+          </div> -->
+        <!-- </div> -->
+        <div class="row-span-2 col-span-1">
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1 class="text-main-3">Status</h1>
+          </div>
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1
+              [ngClass]="{
+                'text-green-500': project.status === ItemStatus.Done,
+                'text-red-500': project.status === ItemStatus.Closed,
+                'text-blue-500': project.status === ItemStatus.New,
+                'text-yellow-500': project.status === ItemStatus.Approved,
+                'text-orange-500': project.status === ItemStatus.InProgress
+              }"
+            >
+              {{ project.status }}
+            </h1>
+          </div>
+        </div>
+        <div class="row-span-2 col-span-1">
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1 class="text-main-3">Priority</h1>
+          </div>
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1
+              [ngClass]="{
+                'text-green-500': project.priority === ItemPriority.Low,
+                'text-red-500': project.priority === ItemPriority.Medium,
+                'text-blue-500': project.priority === ItemPriority.High,
+                'text-yellow-500': project.priority === ItemPriority.Critical,
+              }"
+            >
+              {{ project.priority }}
             </h1>
           </div>
         </div>
