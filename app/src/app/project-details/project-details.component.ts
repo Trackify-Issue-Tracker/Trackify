@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ApiService,
@@ -237,5 +237,11 @@ export class ProjectDetailsComponent {
       issue.title.toLowerCase().includes(term) ||
       issue.description.toLowerCase().includes(term)
     );
+  }
+
+  showIssueForm = false;
+
+  toggleIssueForm() {
+    this.showIssueForm = !this.showIssueForm;
   }
 }

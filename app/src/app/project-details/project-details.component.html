@@ -1,7 +1,7 @@
 <div class="flex w-full transition-all duration-500">
   <hoverbar />
 
-  <div class="flex-col w-screen h-screen overflow-hidden">
+  <div class="flex-col w-screen h-screen">
     <div>
       <infobar title="Project Information" />
     </div>
@@ -9,35 +9,6 @@
     <div class="flex">
       <div class="flex-col w-full p-6">
         <h1 class="text-3xl">{{ project?.name }}</h1>
-        <button (click)="createIssue()">Create Issue</button>
-
-        <div class="flex ml-auto space-x-2">
-          <!-- Input for Project Name -->
-          <input
-            [(ngModel)]="issueTitle"
-            type="text"
-            placeholder="Project Name"
-            class="p-2 border border-gray-300 rounded-lg h-10"
-          />
-
-          <!-- Input for Project Description -->
-          <input
-            [(ngModel)]="issueDescription"
-            type="text"
-            placeholder="Project Description"
-            class="p-2 border border-gray-300 rounded-lg h-10"
-          />
-
-          <!-- Button to Create Project -->
-          <div class="h-10">
-            <button
-              (click)="createIssue()"
-              class="p-2 bg-blues-3 text-white rounded-lg flex items-center space-x-2"
-            >
-              <h1>Create Project</h1>
-            </button>
-          </div>
-        </div>
 
         <p>Project ID: {{ projectId }}</p>
         <p>{{ project?.description }}</p>
@@ -76,17 +47,17 @@
         (cdkDropListDropped)="drop($event)"
         [cdkDropListConnectedTo]="[newList, inProgList, approvedList, doneList]"
       >
-        <h1 class="text-main-4 p-3 border-b border-main-3">NEW</h1>
+        <p class="text-main-4 pl-3 pt-3 border-b border-main-3">NEW</p>
         <div class="overflow-y-auto max-h-96">
           <div
             *ngFor="let issue of filteredNewIssues"
             cdkDrag
-            class="bg-white p-2 rounded-md m-2"
+            class="bg-white rounded-md m-2"
           >
-            <h1>{{ issue.title }}</h1>
-            <p>{{ issue.description }}</p>
-            <div class="flex gap-x-2">
-              <p class="rounded-md p-1.5">{{ issue.type }}</p>
+            <p class="pl-2 pt-2">{{ issue.title }}</p>
+            <p class="pl-2">{{ issue.description }}</p>
+            <div class="flex gap-x-2 pl-2">
+              <p class="rounded-md p-1.5 bg-blue-300">{{ issue.type }}</p>
               <p
                 class="rounded-md p-1.5"
                 [ngClass]="{
@@ -137,6 +108,61 @@
                 {{ issue.priority }}
               </p>
               <p>{{ issue.labels }}</p>
+            </div>
+          </div>
+          <div>
+            <button (click)="toggleIssueForm()" *ngIf="!showIssueForm">
+              Create Issue
+            </button>
+            <div *ngIf="showIssueForm" class="relative">
+              <div
+                class="flex-col p-4 bg-main-1 border-gray-300 rounded-lg shadow-md"
+                (click)="$event.stopPropagation()"
+              >
+                <div class="flex items-center text-main-2">
+                  <svg
+                    class="w-5 h-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M20 11a3 3 0 0 0-3-3h-.6c-.372 0-.557 0-.713-.025a2 2 0 0 1-1.662-1.662C14 6.157 14 5.972 14 5.6V5a3 3 0 0 0-3-3m9 8v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4h4a8 8 0 0 1 8 8Z"
+                    ></path>
+                  </svg>
+                  <input
+                    [(ngModel)]="issueTitle"
+                    type="text"
+                    placeholder="Type a name..."
+                    class="pl-2 rounded-lg bg-main-1 h-10 placeholder:text-main-2"
+                  />
+                </div>
+                <div class="bg-main-3 rounded-lg w-[7.5rem] h-4 p-2">
+                  <div class="flex">
+                    <p>Not started</p>
+                  </div>
+                </div>
+
+                <!-- Input for Project Description -->
+                <input
+                  [(ngModel)]="issueDescription"
+                  type="text"
+                  placeholder="Project Description"
+                  class="p-2 border border-gray-300 rounded-lg h-10 placeholder:text-main-2"
+                />
+                <button
+                  (click)="createIssue()"
+                  class="p-2 bg-blues-3 text-white rounded-lg flex items-center space-x-2"
+                >
+                  <h1>Create Project</h1>
+                </button>
+              </div>
             </div>
           </div>
         </div>
