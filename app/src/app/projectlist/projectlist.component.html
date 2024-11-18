@@ -1,6 +1,6 @@
-<div class="flex-col">
+<div class="flex w-full">
   <div
-    class="w-[85vw] rounded-xl border border-main-3 overflow-hidden drop-shadow-lg"
+    class="relative w-[70vw] rounded-xl border border-main-3 overflow-hidden drop-shadow-lg z-10"
   >
     <!-- Projects Section -->
     <div
@@ -15,7 +15,7 @@
             [(ngModel)]="searchQuery"
             type="text"
             placeholder="Search projects..."
-            class="w-[10rem] rounded-2xl p-2 border border-gray-300"
+            class="w-[20rem] rounded-2xl p-2 border border-gray-300"
           />
         </div>
 
@@ -73,6 +73,7 @@
       <!-- Filtered Projects -->
       <div
         *ngFor="let project of filteredProjects; let i = index"
+        (click)="onProjectClick(project)"
         class="col-span-1 row-span-1 grid grid-cols-8 grid-rows-2 p-2 overflow-hidden bg-white border-b border-blue-3 hover:bg-main-1 transition-all duration-300"
       >
         <div
@@ -81,7 +82,7 @@
           <div
             class="border border-blues-3 w-[2.5rem] h-[2.5rem] rounded-md flex items-center justify-center"
           >
-            <h1 class="text-blues-3">0 {{ i + 1 }}</h1>
+            <h1 class="text-blues-3">0{{ project.id }}</h1>
           </div>
         </div>
         <div class="row-span-2 col-span-1">
@@ -137,19 +138,18 @@
             </h1>
           </div>
         </div>
-        <div class="row-span-2 col-span-1 flex justify-center items-center">
-          <svg
-            class="w-6 h-6 text-main-3 hover:text-main-2"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path
-              d="m13.022 14.999v3.251c0 .412.335.75.752.75.188 0 .375-.071.518-.206 1.775-1.685 4.945-4.692 6.396-6.069.2-.189.312-.452.312-.725 0-.274-.112-.536-.312-.725-1.451-1.377-4.621-4.385-6.396-6.068-.143-.136-.33-.207-.518-.207-.417 0-.752.337-.752.75v3.251h-9.02c-.531 0-1.002.47-1.002 1v3.998c0 .53.471 1 1.002 1zm1.5-4.498v-3.008l4.751 4.507-4.751 4.507v-3.008h-10.022v-2.998z"
-              fill-rule="nonzero"
-            />
-          </svg>
-        </div>
       </div>
     </div>
+  </div>
+  <div
+    *ngIf="isQuickPDetailsVisible"
+    class="w-[20rem] transition-all duration-500 ease-in-out transform ml-4 rounded-xl overflow-hidden border border-main-3 drop-shadow-lg hover:bg-main-1"
+    [ngClass]="{
+      '-translate-x-[30rem]': !translateAfterDelay,
+      'translate-x-0': translateAfterDelay
+    }"
+    (click)="navigateToProject(selectedProject?.id)"
+  >
+    <quickpdetails [project]="selectedProject"></quickpdetails>
   </div>
 </div>

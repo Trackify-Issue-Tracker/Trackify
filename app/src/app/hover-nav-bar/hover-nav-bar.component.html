@@ -1,9 +1,14 @@
 <div
-  class="h-screen bg-main-1 w-16 grid grid-cols-1 grid-rows-10 gap-2 items-center justify-center p-3 transition-all duration-300 ease-in-out hover:w-48 overflow-hidden"
+  class="h-screen bg-blues-4 w-16 grid grid-cols-1 grid-rows-10 gap-2 items-center justify-center p-3 transition-all duration-300 ease-in-out hover:w-48 overflow-hidden"
 >
   <div
+    class="col-span-1 row-span-1 flex items-center justify-start relative pt-1 pl-2 pr-2 pb-2 rounded-md text-main-1"
+  >
+    <h1>logo</h1>
+  </div>
+  <div
     *ngFor="let navItem of navigation"
-    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 bg-blues-4 rounded-md"
+    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 hover:bg-[#1fb5e0] rounded-md"
   >
     <a
       [href]="navItem.url"
@@ -20,12 +25,12 @@
           [attr.d]="svgPath"
         ></path>
       </svg>
-      <span class="absolute left-16 text-main-2">{{ navItem.title }}</span>
+      <span class="absolute left-16 text-main-1">{{ navItem.title }}</span>
     </a>
   </div>
-  <div class="col-span-1 row-span-6"></div>
+  <div class="col-span-1 row-span-5"></div>
   <div
-    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 bg-blues-4 rounded-md"
+    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 bg-blues-4 hover:bg-[#1fb5e0] rounded-md"
     (click)="openSettingsBox()"
   >
     <div class="text-center text-main-1 flex items-center space-x-2">
@@ -38,8 +43,17 @@
           d="M24 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z"
         />
       </svg>
-      <span class="absolute left-16 text-main-2">Settings</span>
+      <span class="absolute left-16 text-main-1">Settings</span>
     </div>
+  </div>
+  <div
+    class="col-span-1 row-span-1 flex items-center justify-start relative pt-1 pl-2 pr-2 pb-2 rounded-md text-main-1"
+  >
+    <svg viewBox="0 0 24 24" class="w-6 h-6 flex-shrink-0" fill="currentColor">
+      <path
+        d="M12 0c-5.083 0-8.465 4.949-3.733 13.678 1.596 2.945-1.725 3.641-5.09 4.418-3.073.709-3.187 2.235-3.177 4.904l.004 1h23.99l.004-.969c.012-2.688-.093-4.223-3.177-4.935-3.438-.794-6.639-1.49-5.09-4.418 4.719-8.912 1.251-13.678-3.731-13.678m0 1c1.89 0 3.39.764 4.225 2.15 1.354 2.251.866 5.824-1.377 10.06-.577 1.092-.673 2.078-.283 2.932.937 2.049 4.758 2.632 6.032 2.928 2.303.534 2.412 1.313 2.401 3.93h-21.998c-.01-2.615.09-3.396 2.401-3.93 1.157-.266 5.138-.919 6.049-2.94.387-.858.284-1.843-.304-2.929-2.231-4.115-2.744-7.764-1.405-10.012.84-1.412 2.353-2.189 4.259-2.189"
+      />
+    </svg>
   </div>
 </div>
 
@@ -51,7 +65,7 @@
   <button (click)="openSettingsBox()" class="pl-4">
     <svg
       viewBox="0 0 24 24"
-      class="w-6 h-6 flex-shrink-0 text-main-2"
+      class="w-6 h-6 flex-shrink-0 text-main-1"
       fill="currentColor"
     >
       <path

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'infobar',
@@ -7,4 +7,6 @@ import { Component } from '@angular/core';
   templateUrl: './info-bar.component.html',
   styleUrl: './info-bar.component.css',
 })
-export class InfoBarComponent {}
+export class InfoBarComponent {
+  @Input() title: string = 'Project Manager';
+}

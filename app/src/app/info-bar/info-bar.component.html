@@ -1,8 +1,41 @@
 <div
-  class="w-[100vw] border border-main-3 overflow-hidden drop-shadow-lg h-[10vh]"
+  class="w-full border-b border-main-3 drop-shadow-lg h-[10vh] flex items-center justify-between px-4"
 >
-  <div class="flex">
-    <h1 class="text-[3rem] pl-2">Trackify</h1>
-    <h1 class="text-[3rem] pl-2">- Project Manager</h1>
+  <h1 class="text-[2rem] pl-2">{{ title }}</h1>
+
+  <div class="flex items-center space-x-4">
+    <!-- Added space-x-4 for spacing -->
+    <div class="rounded-3xl border p-2">
+      <input
+        type="text"
+        placeholder="Search"
+        class="w-[10rem] focus:w-[20rem] transition-all duration-300 rounded-2xl p-2 border border-gray-300 flex items-center justify-center"
+      />
+    </div>
+
+    <div class="relative">
+      <!-- Bell Icon -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-8 h-8 text-gray-700"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-5-5.917V5a2 2 0 10-4 0v.083A6 6 0 004 11v3.159c0 .417-.214.797-.595 1.034L2 17h5m0 0a3 3 0 006 0"
+        />
+      </svg>
+
+      <!-- Notification Badge -->
+      <span
+        class="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"
+      >
+        1
+      </span>
+    </div>
   </div>
 </div>

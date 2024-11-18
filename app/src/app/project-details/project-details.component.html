@@ -1,0 +1,146 @@
+<div class="flex w-full transition-all duration-500">
+  <hoverbar />
+
+  <div class="flex-col w-screen h-screen overflow-hidden">
+    <div>
+      <infobar title="Project Information" />
+    </div>
+    <h1 class="text-l text-main-4 p-4">Projects / {{ project?.name }}</h1>
+    <div class="flex">
+      <div class="flex-col w-full p-6">
+        <h1 class="text-3xl">{{ project?.name }}</h1>
+        <button (click)="createIssue()">Create Issue</button>
+        <p>Project ID: {{ projectId }}</p>
+        <p>{{ project?.description }}</p>
+      </div>
+
+      <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
+      <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
+      <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
+      <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="w-full h-10 p-4">
+      <div>
+        <input
+          type="text"
+          class="w-40rem p-2 border rounded-md"
+          placeholder="Search issues..."
+          [(ngModel)]="searchQuery"
+          (input)="filterIssues()"
+        />
+      </div>
+    </div>
+
+    <!-- Issue Lists -->
+    <div
+      class="grid grid-cols-4 grid-rows-[repeat(auto-fill,minmax(50px,1fr))] justify-between p-3 gap-x-2"
+    >
+      <!-- NEW Issues -->
+      <div
+        id="newList"
+        class="col-span-1 bg-main-3 rounded-md p-2"
+        cdkDropList
+        #newList="cdkDropList"
+        [cdkDropListData]="filteredNewIssues"
+        (cdkDropListDropped)="drop($event)"
+        [cdkDropListConnectedTo]="[newList, inProgList, approvedList, doneList]"
+      >
+        <h1 class="text-main-4 p-3 border-b border-main-3">NEW</h1>
+        <div class="overflow-y-auto max-h-96">
+          <div
+            *ngFor="let issue of filteredNewIssues"
+            cdkDrag
+            class="bg-white p-2 rounded-md m-2"
+          >
+            <h1>{{ issue.title }}</h1>
+            <p>{{ issue.description }}</p>
+            <div class="flex gap-x-2">
+              <p class="rounded-md p-1.5">{{ issue.type }}</p>
+              <p
+                class="rounded-md p-1.5"
+                [ngClass]="{
+                  'bg-priority-1': issue.priority === 'Low',
+                  'bg-priority-2': issue.priority === 'Medium',
+                  'bg-priority-3': issue.priority === 'High',
+                  'bg-priority-4': issue.priority === 'Critical'
+                }"
+              >
+                {{ issue.priority }}
+              </p>
+              <p>{{ issue.labels }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Repeat similar structure for approvedIssues, inProgIssues, doneIssues -->
+      <div
+        id="approvedList"
+        class="col-span-1 bg-main-3 rounded-md p-2"
+        cdkDropList
+        #approvedList="cdkDropList"
+        [cdkDropListData]="filteredApprovedIssues"
+        (cdkDropListDropped)="drop($event)"
+        [cdkDropListConnectedTo]="[newList, inProgList, approvedList, doneList]"
+      >
+        <h1 class="text-main-4 p-3 border-b border-main-3">APPROVED</h1>
+        <div class="overflow-y-auto max-h-96">
+          <div
+            *ngFor="let issue of filteredApprovedIssues"
+            cdkDrag
+            class="bg-white p-2 rounded-md m-2"
+          >
+            <h1>{{ issue.title }}</h1>
+            <p>{{ issue.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="inProgList"
+        class="col-span-1 bg-main-3 rounded-md p-2"
+        cdkDropList
+        #inProgList="cdkDropList"
+        [cdkDropListData]="filteredInProgIssues"
+        (cdkDropListDropped)="drop($event)"
+        [cdkDropListConnectedTo]="[newList, inProgList, approvedList, doneList]"
+      >
+        <h1 class="text-main-4 p-3 border-b border-main-3">IN PROGRESS</h1>
+        <div class="overflow-y-auto max-h-96">
+          <div
+            *ngFor="let issue of filteredInProgIssues"
+            cdkDrag
+            class="bg-white p-2 rounded-md m-2"
+          >
+            <h1>{{ issue.title }}</h1>
+            <p>{{ issue.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="doneList"
+        class="col-span-1 bg-main-3 rounded-md p-2"
+        cdkDropList
+        #doneList="cdkDropList"
+        [cdkDropListData]="filteredDoneIssues"
+        (cdkDropListDropped)="drop($event)"
+        [cdkDropListConnectedTo]="[newList, inProgList, approvedList, doneList]"
+      >
+        <h1 class="text-main-4 p-3 border-b border-main-3">DONE</h1>
+        <div class="overflow-y-auto max-h-96">
+          <div
+            *ngFor="let issue of filteredDoneIssues"
+            cdkDrag
+            class="bg-white p-2 rounded-md m-2"
+          >
+            <h1>{{ issue.title }}</h1>
+            <p>{{ issue.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
