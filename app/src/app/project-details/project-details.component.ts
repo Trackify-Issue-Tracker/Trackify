@@ -246,7 +246,7 @@ export class ProjectDetailsComponent {
 
   showIssueForm = false;
   currentForm = '';
-  showButton = true;
+  showButton = false;
 
   toggleIssueForm(formName: string) {
     this.showIssueForm = !this.showIssueForm;

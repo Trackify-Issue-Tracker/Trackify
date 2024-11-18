@@ -3,15 +3,12 @@
 
   <div class="flex-col w-screen h-screen">
     <div>
-      <infobar title="Project Information" />
+      <infobar title="{{ project?.name }}" />
     </div>
     <h1 class="text-l text-main-4 p-4">Projects / {{ project?.name }}</h1>
     <div class="flex">
-      <div class="flex-col w-full p-6">
-        <h1 class="text-3xl">{{ project?.name }}</h1>
-
-        <p>Project ID: {{ projectId }}</p>
-        <p>{{ project?.description }}</p>
+      <div class="flex-col w-full p-4">
+        <p>Description: {{ project?.description }}</p>
       </div>
 
       <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
@@ -40,6 +37,8 @@
       <!-- NEW List -->
       <div
         id="newList"
+        (mouseover)="showButton = true"
+        (mouseout)="showButton = false"
         class="col-span-1 bg-main-3 rounded-md p-2"
         cdkDropList
         #newList="cdkDropList"
