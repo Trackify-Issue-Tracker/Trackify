@@ -45,6 +45,9 @@ export class ProjectDetailsComponent {
   public projectId: string | null = null;
   project: Project | null = null;
 
+  issueTitle: string = ''; // User input for project name
+  issueDescription: string = ''; // User input for project description
+
   searchQuery: string = '';
   //Original Lists
   newIssues: Issue[] = [];
@@ -106,8 +109,8 @@ export class ProjectDetailsComponent {
     // Make the issue
     const issue: Issue = {
       project_id: this.projectId ?? '',
-      title: 'New Issue',
-      description: 'This is a new issue',
+      title: this.issueTitle,
+      description: this.issueDescription,
       type: ItemType.Bug,
       status: ItemStatus.New,
       priority: ItemPriority.Low,
@@ -115,6 +118,9 @@ export class ProjectDetailsComponent {
     // Create it using the API
     this.apiService.createIssue(issue).subscribe(() => {
       this.getIssues();
+      this.filterIssues();
+      this.issueTitle = '';
+      this.issueDescription = '';
     });
   }
 
