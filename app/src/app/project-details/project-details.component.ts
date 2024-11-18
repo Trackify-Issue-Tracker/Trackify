@@ -44,9 +44,13 @@ export class ProjectDetailsComponent {
   public ItemPriority = ItemPriority;
   public projectId: string | null = null;
   project: Project | null = null;
+  inputLabels: string = '';
 
   issueTitle: string = ''; // User input for project name
   issueDescription: string = ''; // User input for project description
+  issueLabels: Array<string> = []; // User input for project descriptionstring = '';
+  issuePriority: ItemPriority = ItemPriority.Unknown;
+  issueType: ItemType = ItemType.Unknown;
 
   searchQuery: string = '';
   //Original Lists
@@ -109,11 +113,12 @@ export class ProjectDetailsComponent {
     // Make the issue
     const issue: Issue = {
       project_id: this.projectId ?? '',
-      title: this.issueTitle,
-      description: this.issueDescription,
-      type: ItemType.Bug,
+      title: this.issueTitle || 'New Issue',
+      description: this.issueDescription || 'This is a new issue',
+      type: this.issueType,
       status: ItemStatus.New,
-      priority: ItemPriority.Low,
+      priority: this.issuePriority,
+      labels: this.issueLabels,
     };
     // Create it using the API
     this.apiService.createIssue(issue).subscribe(() => {
@@ -240,8 +245,32 @@ export class ProjectDetailsComponent {
   }
 
   showIssueForm = false;
+  currentForm = '';
+  showButton = true;
 
-  toggleIssueForm() {
+  toggleIssueForm(formName: string) {
     this.showIssueForm = !this.showIssueForm;
+    this.currentForm = formName;
+  }
+
+  toggleButton() {
+    this.showButton = false;
+  }
+
+  updateLabels(): void {
+    // Split by commas or spaces, remove extra spaces, and filter out empty values
+    this.issueLabels = this.inputLabels
+      .split(/[\s,]+/)
+      .map((label) => label.trim())
+      .filter((label) => label !== '');
+  }
+
+  deleteIssue(issueId: string) {
+    this.apiService.deleteIssue(issueId).subscribe(() => {
+      this.getIssues();
+      this.filterIssues();
+      this.issueTitle = '';
+      this.issueDescription = '';
+    });
   }
 }

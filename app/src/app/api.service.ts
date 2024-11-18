@@ -17,12 +17,14 @@ export enum ItemStatus {
   Closed = 'Closed',
 }
 export enum ItemPriority {
+  Unknown = '',
   Low = 'Low',
   Medium = 'Medium',
   High = 'High',
   Critical = 'Critical',
 }
 export enum ItemType {
+  Unknown = '',
   Bug = 'Bug',
   Task = 'Task',
   Improvement = 'Improvement',
