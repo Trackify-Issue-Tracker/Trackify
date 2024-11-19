@@ -31,4 +31,4 @@ jobs:
     - name: Lint Angular app
       run: |
         cd app
-        ng lint
+        npm run ng lint --fix

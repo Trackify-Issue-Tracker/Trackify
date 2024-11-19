@@ -15,9 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Build and run the app's containers
+    - name: Build and run the backend containers
       run: |
-        docker compose up -d
+        docker compose up -d backend
+        docker compose up -d postgres
 
     - name: Wait for PostgreSQL to start
       run: |

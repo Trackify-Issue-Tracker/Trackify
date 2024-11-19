@@ -1,12 +1,14 @@
-# Trackify
+# Trackify: An Issue Tracker
 
 ## Overview
 
-Trackify utilizes separate containers for its `PostgreSQL` database, `Python` `Flask` API, and `Angular` frontend hosted on `Nginx`. These components are interconnected via an internal network, ensuring the API and database are shielded from external access. For data persistence, the application communicates with the API over this internal network, which then interfaces with the database to securely store and retrieve data.
+Trackify utilizes separate containers for its `PostgreSQL` database, `Python` API made using `Flask`, and `Angular` frontend hosted on `NgInx`. These components are interconnected via an internal network, ensuring the API and database are shielded from external access. For data persistence, the application communicates with the API over this internal network, which then interfaces with the database to securely store and retrieve data.
 
 ### Architecture
 
 Trackify is designed with containerization in mind, with each component running in its own Docker container, managed using Docker and Docker Compose. The app employs a microservices architecture, where each component communicates with others via RESTful APIs. Additionally, it follows a service-oriented architecture, with each component providing specific services to the others.
+
+![Arcchitecture Diagram](https://raw.githubusercontent.com/Trackify-Issue-Tracker/Trackify/main/architecture.png)
 
 The Docker Compose file, `docker-compose.yml`, is responsible for orchestrating the deployment of these containers. It defines the services, networks, and volumes required for the application to run. The frontend service builds the Angular frontend, the backend service builds the Python Flask API, and the postgres service sets up the PostgreSQL database.
 
@@ -46,6 +48,23 @@ The Angular app, built using the Angular framework, provides a user-friendly int
 - API Service: Responsible for using HTTP methods to work on data in the database through the Python API.
 
 ## Project Setup
+
+
+### Prerequisites
+
+- `Git`: Ensure [Git](https://git-scm.com/downloads) is installed and configured on your local machine.  You can check to see if the CLI is available by running the following command:
+
+    ```bash
+    git --version
+    ```
+
+- `Docker`: Ensure you have [Docker](https://www.docker.com/products/docker-desktop/) installed on your local machine. You can check to see if the CLI is available by running the following command:
+
+    ```bash
+    docker -v
+    ```
+
+### Setup
 
 To set up the Trackify project, follow these steps:
 

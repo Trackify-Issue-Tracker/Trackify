@@ -1,7 +1,7 @@
 import { Component, } from '@angular/core'; //OnInit
 import { Injectable } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ApiService, Project, Issue } from './api.service';
+import { ApiService, Project, Issue, ItemStatus, ItemType } from './api.service';
 
 
 @Component({
@@ -33,17 +33,38 @@ export class AppComponent { // implements OnInit
 
   // }
 
+  deleteAll(): void {
+    this.apiService.reset().subscribe(() => {
+      this.getIssues();
+      this.getProjects();
+    })
+  }
+
+  updateProject(): void {
+    // Make the project
+    const project: Project = {
+      name: 'Updated Project',
+      status: ItemStatus.InProgress,
+    };
+    // Update it using the API
+    this.apiService.updateProject(this.projects[0].id ?? '', project).subscribe(() => {
+      // Refresh the project list
+      this.getProjects();
+    });
+  }
+
   createProject(): void {
     // Make the project
     const project: Project = {
-      id: '', // doesn't get used
       name: 'New Project',
-      description: 'This is a new project'
+      description: 'This is a new project',
+      status: ItemStatus.New,
     };
     // Create it using the API
     this.apiService.createProject(project).subscribe(() => {
       // Refresh the project list
       this.getProjects();
+
     });
   }
 
@@ -56,7 +77,7 @@ export class AppComponent { // implements OnInit
       // nextHandler
       next: (projects: Project[]) => {
         this.projects = projects; // Update the projects array
-        console.log(this.projects);
+        console.log('Projects: ', this.projects);
       },
     });
   }
@@ -64,10 +85,11 @@ export class AppComponent { // implements OnInit
   createIssue(): void {
     // Make the issue
     const issue: Issue = {
-      id: '', // doesn't get used
-      project_id: this.projects[0]['id'],
+      project_id: this.projects[0]['id'] ?? '',
       title: 'New Issue',
-      description: 'This is a new issue'
+      description: 'This is a new issue',
+      type: ItemType.Bug,
+      status: ItemStatus.New,
     };
     // Create it using the API
     this.apiService.createIssue(issue).subscribe(() => {
@@ -91,7 +113,7 @@ export class AppComponent { // implements OnInit
       // nextHandler
       next: (issues: Issue[]) => {
         this.issues = issues; // Update the projects array
-        console.log(this.issues);
+        console.log('Issues: ', this.issues);
       },
     });
   }
