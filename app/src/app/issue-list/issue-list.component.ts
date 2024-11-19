@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, HostListener } from '@angular/core';
+import { Component, inject, OnInit, HostListener, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ApiService,
@@ -20,41 +20,25 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
-import { IssueListComponent } from '../issue-list/issue-list.component';
 
 @Component({
-  selector: 'app-project-detail',
+  selector: 'app-issue-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    HoverNavBarComponent,
-    InfoBarComponent,
-    RouterOutlet,
-    DragDropModule,
-    FormsModule,
-    IssueListComponent,
-  ],
-  styleUrl: './project-details.component.css',
-  templateUrl: './project-details.component.html',
+  imports: [CommonModule, DragDropModule, FormsModule],
+  templateUrl: './issue-list.component.html',
+  styleUrl: './issue-list.component.css',
 })
-@Injectable({
-  providedIn: 'root',
-})
-export class ProjectDetailsComponent {
-  issues: Issue[] = [];
-  public ItemStatus = ItemStatus;
-  public ItemPriority = ItemPriority;
+export class IssueListComponent {
   public projectId: string | null = null;
   project: Project | null = null;
-  inputLabels: string = '';
 
+  issues: Issue[] = [];
   issueTitle: string = ''; // User input for project name
   issueDescription: string = ''; // User input for project description
   issueLabels: Array<string> = []; // User input for project descriptionstring = '';
   issuePriority: ItemPriority = ItemPriority.Unknown;
   issueType: ItemType = ItemType.Unknown;
 
-  searchQuery: string = '';
   //Original Lists
   newIssues: Issue[] = [];
   inProgIssues: Issue[] = [];
@@ -67,7 +51,19 @@ export class ProjectDetailsComponent {
   filteredInProgIssues = this.inProgIssues;
   filteredDoneIssues = this.doneIssues;
 
+  showIssueForm = false;
+  currentForm = '';
+  showButton = false;
+
+  searchQuery: string = '';
   searchTerm: string = '';
+
+  @Input() listId: string = '';
+  @Input() connectedLists: string[] = [];
+  @Input() filteredIssues: Issue[] = [];
+  @Input() listTitle: string = '';
+
+  inputLabels: string = '';
 
   constructor(private apiService: ApiService, private route: ActivatedRoute) {
     this.getIssues();
@@ -84,6 +80,79 @@ export class ProjectDetailsComponent {
         this.getIssues();
         this.filterIssues();
       }
+    });
+  }
+
+  getProject(id: string): void {
+    this.apiService.getProject(this.projectId ?? '').subscribe({
+      next: (project: Project) => {
+        this.project = project; // Store the fetched project data
+      },
+      error: (err) => {
+        console.error('Error fetching project:', err);
+        console.log(this.project);
+      },
+    });
+  }
+
+  toggleIssueForm(formName: string) {
+    this.showIssueForm = !this.showIssueForm;
+    this.currentForm = formName;
+  }
+
+  toggleButton() {
+    this.showButton = false;
+  }
+
+  updateLabels(): void {
+    // Split by commas or spaces, remove extra spaces, and filter out empty values
+    this.issueLabels = this.inputLabels
+      .split(/[\s,]+/)
+      .map((label) => label.trim())
+      .filter((label) => label !== '');
+  }
+
+  getIssues(): void {
+    // This is one way of using the API
+    // See getProjects for the other way
+    // this.apiService.getAllIssues().subscribe((issues: Issue[]) => {
+    //   this.issues = issues;
+    // });
+
+    this.apiService.getAllIssuesOfProject(this.projectId ?? '').subscribe({
+      // completeHandler
+      complete: () => {},
+      // errorHandler
+      error: (error) => {
+        console.error(error);
+      },
+      // nextHandler
+      next: (issues: Issue[]) => {
+        this.issues = issues; // Update the issues array
+        this.updateArrays();
+        this.filterIssues();
+        console.log('Issues: ', this.issues);
+      },
+    });
+  }
+
+  createIssue(): void {
+    // Make the issue
+    const issue: Issue = {
+      project_id: this.projectId ?? '',
+      title: this.issueTitle || 'New Issue',
+      description: this.issueDescription || 'This is a new issue',
+      type: this.issueType,
+      status: ItemStatus.New,
+      priority: this.issuePriority,
+      labels: this.issueLabels,
+    };
+    // Create it using the API
+    this.apiService.createIssue(issue).subscribe(() => {
+      this.getIssues();
+      this.filterIssues();
+      this.issueTitle = '';
+      this.issueDescription = '';
     });
   }
 
@@ -111,80 +180,13 @@ export class ProjectDetailsComponent {
     );
   }
 
-  createIssue(): void {
-    // Make the issue
-    const issue: Issue = {
-      project_id: this.projectId ?? '',
-      title: this.issueTitle || 'New Issue',
-      description: this.issueDescription || 'This is a new issue',
-      type: this.issueType,
-      status: ItemStatus.New,
-      priority: this.issuePriority,
-      labels: this.issueLabels,
-    };
-    // Create it using the API
-    this.apiService.createIssue(issue).subscribe(() => {
+  deleteIssue(issueId: string) {
+    this.apiService.deleteIssue(issueId).subscribe(() => {
       this.getIssues();
       this.filterIssues();
       this.issueTitle = '';
       this.issueDescription = '';
     });
-  }
-
-  getIssues(): void {
-    // This is one way of using the API
-    // See getProjects for the other way
-    // this.apiService.getAllIssues().subscribe((issues: Issue[]) => {
-    //   this.issues = issues;
-    // });
-
-    this.apiService.getAllIssuesOfProject(this.projectId ?? '').subscribe({
-      // completeHandler
-      complete: () => {},
-      // errorHandler
-      error: (error) => {
-        console.error(error);
-      },
-      // nextHandler
-      next: (issues: Issue[]) => {
-        this.issues = issues; // Update the projects array
-        this.updateArrays();
-        console.log('Issues: ', this.issues);
-      },
-    });
-  }
-
-  getProject(id: string): void {
-    this.apiService.getProject(this.projectId ?? '').subscribe({
-      next: (project: Project) => {
-        this.project = project; // Store the fetched project data
-      },
-      error: (err) => {
-        console.error('Error fetching project:', err);
-      },
-    });
-  }
-
-  filterNewIssues(): void {
-    this.newIssues = this.issues.filter(
-      (issue) => issue.status === ItemStatus.New
-    );
-  }
-  filterInProgIssues(): void {
-    this.inProgIssues = this.issues.filter(
-      (issue) => issue.status === ItemStatus.InProgress
-    );
-  }
-  filterDoneIssues(): void {
-    this.doneIssues = this.issues.filter(
-      (issue) => issue.status === ItemStatus.Done
-    );
-  }
-
-  filterApprovedIssues(): void {
-    this.approvedIssues = this.issues.filter(
-      (issue) => issue.status === ItemStatus.Approved
-    );
   }
 
   drop(event: CdkDragDrop<Issue[]>): void {
@@ -237,42 +239,25 @@ export class ProjectDetailsComponent {
     this.filterDoneIssues();
   }
 
-  // Helper function to check if an issue matches the search term
-  matchesSearch(issue: { title: string; description: string }) {
-    const term = this.searchTerm.toLowerCase();
-    return (
-      issue.title.toLowerCase().includes(term) ||
-      issue.description.toLowerCase().includes(term)
+  filterNewIssues(): void {
+    this.newIssues = this.issues.filter(
+      (issue) => issue.status === ItemStatus.New
+    );
+  }
+  filterInProgIssues(): void {
+    this.inProgIssues = this.issues.filter(
+      (issue) => issue.status === ItemStatus.InProgress
+    );
+  }
+  filterDoneIssues(): void {
+    this.doneIssues = this.issues.filter(
+      (issue) => issue.status === ItemStatus.Done
     );
   }
 
-  showIssueForm = false;
-  currentForm = '';
-  showButton = false;
-
-  toggleIssueForm(formName: string) {
-    this.showIssueForm = !this.showIssueForm;
-    this.currentForm = formName;
-  }
-
-  toggleButton() {
-    this.showButton = false;
-  }
-
-  updateLabels(): void {
-    // Split by commas or spaces, remove extra spaces, and filter out empty values
-    this.issueLabels = this.inputLabels
-      .split(/[\s,]+/)
-      .map((label) => label.trim())
-      .filter((label) => label !== '');
-  }
-
-  deleteIssue(issueId: string) {
-    this.apiService.deleteIssue(issueId).subscribe(() => {
-      this.getIssues();
-      this.filterIssues();
-      this.issueTitle = '';
-      this.issueDescription = '';
-    });
+  filterApprovedIssues(): void {
+    this.approvedIssues = this.issues.filter(
+      (issue) => issue.status === ItemStatus.Approved
+    );
   }
 }
