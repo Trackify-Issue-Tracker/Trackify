@@ -69,9 +69,7 @@ export class ProjectDetailsComponent {
 
   searchTerm: string = '';
 
-  constructor(private apiService: ApiService, private route: ActivatedRoute) {
-    this.getIssues();
-  }
+  constructor(private apiService: ApiService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     // Get the project ID from the URL
@@ -81,76 +79,7 @@ export class ProjectDetailsComponent {
       if (this.projectId) {
         // Now that we have the project ID, fetch the project from the API
         this.getProject(this.projectId);
-        this.getIssues();
-        this.filterIssues();
       }
-    });
-  }
-
-  filterIssues() {
-    const query = this.searchQuery.toLowerCase();
-    this.filteredNewIssues = this.newIssues.filter(
-      (issue) =>
-        issue.title.toLowerCase().includes(query) ||
-        (issue.description ?? '').toLowerCase().includes(query)
-    );
-    this.filteredApprovedIssues = this.approvedIssues.filter(
-      (issue) =>
-        issue.title.toLowerCase().includes(query) ||
-        (issue.description ?? '').toLowerCase().includes(query)
-    );
-    this.filteredInProgIssues = this.inProgIssues.filter(
-      (issue) =>
-        issue.title.toLowerCase().includes(query) ||
-        (issue.description ?? '').toLowerCase().includes(query)
-    );
-    this.filteredDoneIssues = this.doneIssues.filter(
-      (issue) =>
-        issue.title.toLowerCase().includes(query) ||
-        (issue.description ?? '').toLowerCase().includes(query)
-    );
-  }
-
-  createIssue(): void {
-    // Make the issue
-    const issue: Issue = {
-      project_id: this.projectId ?? '',
-      title: this.issueTitle || 'New Issue',
-      description: this.issueDescription || 'This is a new issue',
-      type: this.issueType,
-      status: ItemStatus.New,
-      priority: this.issuePriority,
-      labels: this.issueLabels,
-    };
-    // Create it using the API
-    this.apiService.createIssue(issue).subscribe(() => {
-      this.getIssues();
-      this.filterIssues();
-      this.issueTitle = '';
-      this.issueDescription = '';
-    });
-  }
-
-  getIssues(): void {
-    // This is one way of using the API
-    // See getProjects for the other way
-    // this.apiService.getAllIssues().subscribe((issues: Issue[]) => {
-    //   this.issues = issues;
-    // });
-
-    this.apiService.getAllIssuesOfProject(this.projectId ?? '').subscribe({
-      // completeHandler
-      complete: () => {},
-      // errorHandler
-      error: (error) => {
-        console.error(error);
-      },
-      // nextHandler
-      next: (issues: Issue[]) => {
-        this.issues = issues; // Update the projects array
-        this.updateArrays();
-        console.log('Issues: ', this.issues);
-      },
     });
   }
 
@@ -163,6 +92,60 @@ export class ProjectDetailsComponent {
         console.error('Error fetching project:', err);
       },
     });
+  }
+
+  drop(event: CdkDragDrop<Issue[]>): void {
+    const draggedIssue = event.item.data;
+
+    const containerId = event.container.element.nativeElement.id;
+
+    if (event.previousContainer === event.container) {
+      // Handle reordering within the same list
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+      console.log('thisworking');
+      this.updateArrays();
+    } else {
+      // Map the containerId to the status of the issue
+      const newStatusMap = {
+        newList: ItemStatus.New,
+        approvedList: ItemStatus.Approved,
+        inProgList: ItemStatus.InProgress,
+        doneList: ItemStatus.Done,
+      };
+
+      const status = newStatusMap[containerId as keyof typeof newStatusMap];
+
+      draggedIssue.status = status;
+
+      // Update the issue on the backend
+      this.apiService
+        .updateIssue(draggedIssue.id ?? '', draggedIssue)
+        .subscribe({
+          next: () => {
+            transferArrayItem(
+              event.previousContainer.data,
+              event.container.data,
+              event.previousIndex,
+              event.currentIndex
+            );
+            this.updateArrays();
+          },
+          error: (err) => {
+            console.error('Error updating issue:', err);
+          },
+        });
+    }
+  }
+
+  updateArrays(): void {
+    this.filterNewIssues();
+    this.filterApprovedIssues();
+    this.filterInProgIssues();
+    this.filterDoneIssues();
   }
 
   filterNewIssues(): void {
@@ -185,94 +168,5 @@ export class ProjectDetailsComponent {
     this.approvedIssues = this.issues.filter(
       (issue) => issue.status === ItemStatus.Approved
     );
-  }
-
-  drop(event: CdkDragDrop<Issue[]>): void {
-    const issue = event.previousContainer.data[event.previousIndex];
-    const containerId = event.container.element.nativeElement.id;
-
-    if (event.previousContainer === event.container) {
-      // Handle reordering within the same list
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-      this.getIssues();
-    } else {
-      // Update the issue's status based on the container it was dropped into
-      const newStatusMap = {
-        newList: ItemStatus.New,
-        approvedList: ItemStatus.Approved,
-        inProgList: ItemStatus.InProgress,
-        doneList: ItemStatus.Done,
-      };
-
-      const status = newStatusMap[containerId as keyof typeof newStatusMap];
-
-      issue.status = status;
-      // Update the issue on the backend or local storage
-      this.apiService.updateIssue(issue.id ?? '', issue).subscribe({
-        next: () => {
-          // Move the item visually after a successful update
-          transferArrayItem(
-            event.previousContainer.data,
-            event.container.data,
-            event.previousIndex,
-            event.currentIndex
-          );
-          this.updateArrays();
-        },
-        error: (err) => console.error('Error updating issue:', err),
-      });
-
-      this.getIssues();
-    }
-  }
-
-  updateArrays(): void {
-    this.filterNewIssues();
-    this.filterApprovedIssues();
-    this.filterInProgIssues();
-    this.filterDoneIssues();
-  }
-
-  // Helper function to check if an issue matches the search term
-  matchesSearch(issue: { title: string; description: string }) {
-    const term = this.searchTerm.toLowerCase();
-    return (
-      issue.title.toLowerCase().includes(term) ||
-      issue.description.toLowerCase().includes(term)
-    );
-  }
-
-  showIssueForm = false;
-  currentForm = '';
-  showButton = false;
-
-  toggleIssueForm(formName: string) {
-    this.showIssueForm = !this.showIssueForm;
-    this.currentForm = formName;
-  }
-
-  toggleButton() {
-    this.showButton = false;
-  }
-
-  updateLabels(): void {
-    // Split by commas or spaces, remove extra spaces, and filter out empty values
-    this.issueLabels = this.inputLabels
-      .split(/[\s,]+/)
-      .map((label) => label.trim())
-      .filter((label) => label !== '');
-  }
-
-  deleteIssue(issueId: string) {
-    this.apiService.deleteIssue(issueId).subscribe(() => {
-      this.getIssues();
-      this.filterIssues();
-      this.issueTitle = '';
-      this.issueDescription = '';
-    });
   }
 }

@@ -1,4 +1,4 @@
-<div class="flex w-full transition-all duration-500">
+<div class="flex w-full transition-all duration-500 overflow-hidden">
   <hoverbar />
 
   <div class="flex-col w-screen h-screen">
@@ -9,24 +9,6 @@
     <div class="flex">
       <div class="flex-col w-full p-4">
         <p>Description: {{ project?.description }}</p>
-        <button (click)="createIssue()" class="">
-          <svg
-            clip-rule="evenodd"
-            fill-rule="evenodd"
-            stroke-linejoin="round"
-            stroke-miterlimit="2"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            stroke="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="m11 11h-7.25c-.414 0-.75.336-.75.75s.336.75.75.75h7.25v7.25c0 .414.336.75.75.75s.75-.336.75-.75v-7.25h7.25c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-7.25v-7.25c0-.414-.336-.75-.75-.75s-.75.336-.75.75z"
-              fill-rule="nonzero"
-            />
-          </svg>
-        </button>
       </div>
 
       <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
@@ -43,7 +25,6 @@
           class="w-40rem p-2 border rounded-md"
           placeholder="Search issues..."
           [(ngModel)]="searchQuery"
-          (input)="filterIssues()"
         />
       </div>
     </div>
@@ -53,26 +34,39 @@
       class="grid grid-cols-4 grid-rows-[repeat(auto-fill,minmax(50px,1fr))] justify-between p-3 gap-x-2"
     >
       <!-- NEW List -->
+
       <app-issue-list
         [listId]="'newList'"
-        [filteredIssues]="filteredNewIssues"
+        [filteredIssuesKey]="'filteredNewIssues'"
         [listTitle]="'NEW'"
+        [connectedLists]="['newList', 'approvedList', 'inProgList', 'doneList']"
+        [searchQuery]="searchQuery"
       ></app-issue-list>
+
       <app-issue-list
         [listId]="'approvedList'"
-        [filteredIssues]="filteredApprovedIssues"
+        [filteredIssuesKey]="'filteredApprovedIssues'"
         [listTitle]="'APPROVED'"
+        [connectedLists]="['newList', 'approvedList', 'inProgList', 'doneList']"
+        [searchQuery]="searchQuery"
       ></app-issue-list>
+
       <app-issue-list
         [listId]="'inProgList'"
-        [filteredIssues]="filteredInProgIssues"
+        [filteredIssuesKey]="'filteredInProgIssues'"
         [listTitle]="'IN PROGRESS'"
+        [connectedLists]="['newList', 'approvedList', 'inProgList', 'doneList']"
+        [searchQuery]="searchQuery"
       ></app-issue-list>
+
       <app-issue-list
         [listId]="'doneList'"
-        [filteredIssues]="filteredDoneIssues"
+        [filteredIssuesKey]="'filteredDoneIssues'"
         [listTitle]="'DONE'"
+        [connectedLists]="['newList, approvedList, inProgList, doneList']"
+        [searchQuery]="searchQuery"
       ></app-issue-list>
+
       <!-- IN PROGRESS List -->
 
       <!-- DONE List -->

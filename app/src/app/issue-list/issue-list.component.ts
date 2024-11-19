@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, HostListener, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ApiService,
@@ -8,10 +8,7 @@ import {
   ItemType,
   ItemPriority,
 } from '../api.service';
-import { HoverNavBarComponent } from '../hover-nav-bar/hover-nav-bar.component';
-import { InfoBarComponent } from '../info-bar/info-bar.component';
-import { Injectable } from '@angular/core';
-import { Route, RouterOutlet } from '@angular/router';
+
 import { ActivatedRoute } from '@angular/router';
 import {
   CdkDragDrop,
@@ -38,6 +35,7 @@ export class IssueListComponent {
   issueLabels: Array<string> = []; // User input for project descriptionstring = '';
   issuePriority: ItemPriority = ItemPriority.Unknown;
   issueType: ItemType = ItemType.Unknown;
+  issueStatus: ItemStatus = ItemStatus.New;
 
   //Original Lists
   newIssues: Issue[] = [];
@@ -55,13 +53,13 @@ export class IssueListComponent {
   currentForm = '';
   showButton = false;
 
-  searchQuery: string = '';
   searchTerm: string = '';
 
+  @Input() filteredIssuesKey: string = '';
   @Input() listId: string = '';
   @Input() connectedLists: string[] = [];
-  @Input() filteredIssues: Issue[] = [];
   @Input() listTitle: string = '';
+  @Input() searchQuery: string = '';
 
   inputLabels: string = '';
 
@@ -83,6 +81,23 @@ export class IssueListComponent {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['searchQuery']) {
+      this.filterIssues();
+    }
+  }
+
+  getFilteredIssues() {
+    const issuesMap: { [key: string]: any[] } = {
+      filteredNewIssues: this.filteredNewIssues,
+      filteredApprovedIssues: this.filteredApprovedIssues,
+      filteredInProgIssues: this.filteredInProgIssues,
+      filteredDoneIssues: this.filteredDoneIssues,
+    };
+
+    return issuesMap[this.filteredIssuesKey] || [];
+  }
+
   getProject(id: string): void {
     this.apiService.getProject(this.projectId ?? '').subscribe({
       next: (project: Project) => {
@@ -95,13 +110,19 @@ export class IssueListComponent {
     });
   }
 
-  toggleIssueForm(formName: string) {
-    this.showIssueForm = !this.showIssueForm;
-    this.currentForm = formName;
-  }
-
-  toggleButton() {
-    this.showButton = false;
+  toggleFormAndButton(formName: string) {
+    if (this.currentForm === formName && this.showIssueForm) {
+      // If the same form is already open, close it
+      this.showIssueForm = false;
+      this.currentForm = '';
+      this.showButton = false;
+    } else {
+      // Open the form and hide the button
+      this.showIssueForm = true;
+      this.currentForm = formName;
+      this.showButton = false;
+      console.log(this.showButton);
+    }
   }
 
   updateLabels(): void {
@@ -137,13 +158,14 @@ export class IssueListComponent {
   }
 
   createIssue(): void {
+    this.setIssueStatusBasedOnListTitle();
     // Make the issue
     const issue: Issue = {
       project_id: this.projectId ?? '',
       title: this.issueTitle || 'New Issue',
       description: this.issueDescription || 'This is a new issue',
       type: this.issueType,
-      status: ItemStatus.New,
+      status: this.issueStatus,
       priority: this.issuePriority,
       labels: this.issueLabels,
     };
@@ -156,8 +178,37 @@ export class IssueListComponent {
     });
   }
 
+  setIssueStatusBasedOnListTitle(): void {
+    switch (this.listTitle.toUpperCase()) {
+      case 'NEW':
+        this.issueStatus = ItemStatus.New;
+        break;
+      case 'APPROVED':
+        this.issueStatus = ItemStatus.Approved;
+        break;
+      case 'IN PROGRESS':
+        this.issueStatus = ItemStatus.InProgress;
+        break;
+      case 'DONE':
+        this.issueStatus = ItemStatus.Done;
+        break;
+      default:
+        this.issueStatus = ItemStatus.New; // Default status in case of unexpected title
+        break;
+    }
+  }
+  deleteIssue(issueId: string) {
+    this.apiService.deleteIssue(issueId).subscribe(() => {
+      this.getIssues();
+      this.filterIssues();
+      this.issueTitle = '';
+      this.issueDescription = '';
+    });
+  }
+
   filterIssues() {
     const query = this.searchQuery.toLowerCase();
+
     this.filteredNewIssues = this.newIssues.filter(
       (issue) =>
         issue.title.toLowerCase().includes(query) ||
@@ -180,15 +231,6 @@ export class IssueListComponent {
     );
   }
 
-  deleteIssue(issueId: string) {
-    this.apiService.deleteIssue(issueId).subscribe(() => {
-      this.getIssues();
-      this.filterIssues();
-      this.issueTitle = '';
-      this.issueDescription = '';
-    });
-  }
-
   drop(event: CdkDragDrop<Issue[]>): void {
     const issue = event.previousContainer.data[event.previousIndex];
     const containerId = event.container.element.nativeElement.id;
@@ -200,7 +242,7 @@ export class IssueListComponent {
         event.previousIndex,
         event.currentIndex
       );
-      this.getIssues();
+      this.updateArrays(); // Ensure array update
     } else {
       // Update the issue's status based on the container it was dropped into
       const newStatusMap = {
@@ -212,8 +254,14 @@ export class IssueListComponent {
 
       const status = newStatusMap[containerId as keyof typeof newStatusMap];
 
+      if (!status) {
+        console.error('Invalid container ID');
+        return; // Avoid updating if there's no valid status
+      }
+
       issue.status = status;
-      // Update the issue on the backend or local storage
+
+      // Call the API to update the issue status
       this.apiService.updateIssue(issue.id ?? '', issue).subscribe({
         next: () => {
           // Move the item visually after a successful update
@@ -223,12 +271,13 @@ export class IssueListComponent {
             event.previousIndex,
             event.currentIndex
           );
-          this.updateArrays();
+          this.updateArrays(); // Ensure array update
         },
-        error: (err) => console.error('Error updating issue:', err),
+        error: (err) => {
+          console.error('Error updating issue:', err);
+          // Optionally show user-friendly message in the UI
+        },
       });
-
-      this.getIssues();
     }
   }
 
