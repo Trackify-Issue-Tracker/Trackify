@@ -1,19 +1,17 @@
 <div
-  class="h-screen bg-blues-4 w-16 grid grid-cols-1 grid-rows-10 gap-2 items-center justify-center p-3 transition-all duration-300 ease-in-out hover:w-48 overflow-hidden"
+  class="h-screen bg-white border w-16 grid grid-cols-1 grid-rows-12 gap-2 items-center justify-center p-3 transition-all duration-300 ease-in-out hover:w-48 overflow-hidden"
 >
   <div
-    class="col-span-1 row-span-1 flex items-center justify-start relative pt-1 pl-2 pr-2 pb-2 rounded-md text-main-1"
-  >
-    <h1>logo</h1>
-  </div>
+    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 rounded-md text-blues-1 bg-blues-2"
+  ></div>
   <div
     *ngFor="let navItem of navigation"
-    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 hover:bg-[#1fb5e0] rounded-md"
+    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 hover:bg-blues-3 bg-blues-2 rounded-md text-blues-1"
   >
     <a
       [href]="navItem.url"
       [id]="navItem.id"
-      class="text-center text-main-1 flex items-center space-x-2"
+      class="text-center flex items-center space-x-2"
     >
       <svg
         viewBox="0 0 24 24"
@@ -28,9 +26,9 @@
       <span class="absolute left-16 text-main-1">{{ navItem.title }}</span>
     </a>
   </div>
-  <div class="col-span-1 row-span-5"></div>
+  <div class="col-span-1 row-span-8"></div>
   <div
-    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 bg-blues-4 hover:bg-[#1fb5e0] rounded-md"
+    class="col-span-1 row-span-1 flex items-center justify-start relative p-2 bg-blues-2 hover:bg-blues-3 rounded-md"
     (click)="openSettingsBox()"
   >
     <div class="text-center text-main-1 flex items-center space-x-2">
@@ -47,7 +45,7 @@
     </div>
   </div>
   <div
-    class="col-span-1 row-span-1 flex items-center justify-start relative pt-1 pl-2 pr-2 pb-2 rounded-md text-main-1"
+    class="col-span-1 row-span-1 flex items-center justify-start relative pt-1 pl-2 pr-2 pb-2 rounded-md text-blues-1 bg-blues-2"
   >
     <svg viewBox="0 0 24 24" class="w-6 h-6 flex-shrink-0" fill="currentColor">
       <path
@@ -59,7 +57,7 @@
 
 <div
   *ngIf="showSettingsBox"
-  class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded shadow-lg z-50 flex"
+  class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blues-1 p-4 rounded shadow-lg z-50 flex"
 >
   <h2 class="text-lg font-bold">Settings</h2>
   <button (click)="openSettingsBox()" class="pl-4">

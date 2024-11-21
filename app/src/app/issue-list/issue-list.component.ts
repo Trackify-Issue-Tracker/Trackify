@@ -1,4 +1,13 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  SimpleChanges,
+  EventEmitter,
+  Output,
+  HostListener,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ApiService,
@@ -32,7 +41,7 @@ export class IssueListComponent {
   issues: Issue[] = [];
   issueTitle: string = ''; // User input for project name
   issueDescription: string = ''; // User input for project description
-  issueLabels: Array<string> = []; // User input for project descriptionstring = '';
+  issueLabels: Array<string> = [];
   issuePriority: ItemPriority = ItemPriority.Unknown;
   issueType: ItemType = ItemType.Unknown;
   issueStatus: ItemStatus = ItemStatus.New;
@@ -53,13 +62,12 @@ export class IssueListComponent {
   currentForm = '';
   showButton = false;
 
-  searchTerm: string = '';
-
   @Input() filteredIssuesKey: string = '';
   @Input() listId: string = '';
   @Input() connectedLists: string[] = [];
   @Input() listTitle: string = '';
   @Input() searchQuery: string = '';
+  @Output() refreshAllLists = new EventEmitter<void>();
 
   inputLabels: string = '';
 
@@ -126,11 +134,13 @@ export class IssueListComponent {
   }
 
   updateLabels(): void {
-    // Split by commas or spaces, remove extra spaces, and filter out empty values
+    // Split the input string into an array of labels
     this.issueLabels = this.inputLabels
       .split(/[\s,]+/)
       .map((label) => label.trim())
       .filter((label) => label !== '');
+    // Clear the input field (optional)
+    this.inputLabels = '';
   }
 
   getIssues(): void {
@@ -159,7 +169,10 @@ export class IssueListComponent {
 
   createIssue(): void {
     this.setIssueStatusBasedOnListTitle();
+    this.updateLabels();
+    console.log(this.issueLabels);
     // Make the issue
+
     const issue: Issue = {
       project_id: this.projectId ?? '',
       title: this.issueTitle || 'New Issue',
@@ -175,6 +188,10 @@ export class IssueListComponent {
       this.filterIssues();
       this.issueTitle = '';
       this.issueDescription = '';
+      this.issueLabels = [];
+      this.issuePriority = ItemPriority.Unknown;
+      this.issueType = ItemType.Unknown;
+      this.issueStatus = ItemStatus.New;
     });
   }
 
@@ -200,9 +217,6 @@ export class IssueListComponent {
   deleteIssue(issueId: string) {
     this.apiService.deleteIssue(issueId).subscribe(() => {
       this.getIssues();
-      this.filterIssues();
-      this.issueTitle = '';
-      this.issueDescription = '';
     });
   }
 
@@ -232,7 +246,7 @@ export class IssueListComponent {
   }
 
   drop(event: CdkDragDrop<Issue[]>): void {
-    const issue = event.previousContainer.data[event.previousIndex];
+    const issue = event.item.data;
     const containerId = event.container.element.nativeElement.id;
 
     if (event.previousContainer === event.container) {
@@ -243,6 +257,7 @@ export class IssueListComponent {
         event.currentIndex
       );
       this.updateArrays(); // Ensure array update
+      this.refreshAllLists.emit();
     } else {
       // Update the issue's status based on the container it was dropped into
       const newStatusMap = {
@@ -272,6 +287,7 @@ export class IssueListComponent {
             event.currentIndex
           );
           this.updateArrays(); // Ensure array update
+          this.refreshAllLists.emit();
         },
         error: (err) => {
           console.error('Error updating issue:', err);
@@ -308,5 +324,23 @@ export class IssueListComponent {
     this.approvedIssues = this.issues.filter(
       (issue) => issue.status === ItemStatus.Approved
     );
+  }
+
+  sortIssuesAZ(): void {
+    // Sorting the arrays alphabetically based on the issue title
+    this.newIssues.sort((a, b) => a.title.localeCompare(b.title));
+    this.inProgIssues.sort((a, b) => a.title.localeCompare(b.title));
+    this.doneIssues.sort((a, b) => a.title.localeCompare(b.title));
+    this.approvedIssues.sort((a, b) => a.title.localeCompare(b.title));
+    this.filterIssues();
+  }
+
+  sortIssuesZA(): void {
+    // Sorting the arrays alphabetically based on the issue title
+    this.newIssues.sort((a, b) => b.title.localeCompare(a.title));
+    this.inProgIssues.sort((a, b) => b.title.localeCompare(a.title));
+    this.doneIssues.sort((a, b) => b.title.localeCompare(a.title));
+    this.approvedIssues.sort((a, b) => b.title.localeCompare(a.title));
+    this.filterIssues();
   }
 }

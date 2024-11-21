@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, HostListener } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ViewChild,
+  HostListener,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ApiService,
@@ -46,28 +52,17 @@ export class ProjectDetailsComponent {
   public ItemPriority = ItemPriority;
   public projectId: string | null = null;
   project: Project | null = null;
-  inputLabels: string = '';
-
-  issueTitle: string = ''; // User input for project name
-  issueDescription: string = ''; // User input for project description
-  issueLabels: Array<string> = []; // User input for project descriptionstring = '';
-  issuePriority: ItemPriority = ItemPriority.Unknown;
-  issueType: ItemType = ItemType.Unknown;
 
   searchQuery: string = '';
-  //Original Lists
-  newIssues: Issue[] = [];
-  inProgIssues: Issue[] = [];
-  doneIssues: Issue[] = [];
-  approvedIssues: Issue[] = [];
+  sortOption: string = '';
+  connectedLists = ['newList', 'approvedList', 'inProgList', 'doneList'];
 
-  // Filtered Lists
-  filteredNewIssues = this.newIssues;
-  filteredApprovedIssues = this.approvedIssues;
-  filteredInProgIssues = this.inProgIssues;
-  filteredDoneIssues = this.doneIssues;
-
-  searchTerm: string = '';
+  // References to child components
+  @ViewChild('newListComponent') newListComponent!: IssueListComponent;
+  @ViewChild('approvedListComponent')
+  approvedListComponent!: IssueListComponent;
+  @ViewChild('inProgListComponent') inProgListComponent!: IssueListComponent;
+  @ViewChild('doneListComponent') doneListComponent!: IssueListComponent;
 
   constructor(private apiService: ApiService, private route: ActivatedRoute) {}
 
@@ -94,79 +89,46 @@ export class ProjectDetailsComponent {
     });
   }
 
-  drop(event: CdkDragDrop<Issue[]>): void {
-    const draggedIssue = event.item.data;
+  onRefreshAllLists(): void {
+    // Loop through connectedLists and trigger refresh for each corresponding child component
+    this.connectedLists.forEach((listId) => {
+      const childComponent = this.getChildComponentById(listId);
+      if (childComponent) {
+        childComponent.getIssues(); // Trigger refresh on the child component
+        console.log(childComponent.issues);
+      }
+    });
+  }
 
-    const containerId = event.container.element.nativeElement.id;
-
-    if (event.previousContainer === event.container) {
-      // Handle reordering within the same list
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-      console.log('thisworking');
-      this.updateArrays();
-    } else {
-      // Map the containerId to the status of the issue
-      const newStatusMap = {
-        newList: ItemStatus.New,
-        approvedList: ItemStatus.Approved,
-        inProgList: ItemStatus.InProgress,
-        doneList: ItemStatus.Done,
-      };
-
-      const status = newStatusMap[containerId as keyof typeof newStatusMap];
-
-      draggedIssue.status = status;
-
-      // Update the issue on the backend
-      this.apiService
-        .updateIssue(draggedIssue.id ?? '', draggedIssue)
-        .subscribe({
-          next: () => {
-            transferArrayItem(
-              event.previousContainer.data,
-              event.container.data,
-              event.previousIndex,
-              event.currentIndex
-            );
-            this.updateArrays();
-          },
-          error: (err) => {
-            console.error('Error updating issue:', err);
-          },
-        });
+  // Map listId to corresponding child component
+  getChildComponentById(listId: string): IssueListComponent | null {
+    switch (listId) {
+      case 'newList':
+        return this.newListComponent;
+      case 'approvedList':
+        return this.approvedListComponent;
+      case 'inProgList':
+        return this.inProgListComponent;
+      case 'doneList':
+        return this.doneListComponent;
+      default:
+        return null;
     }
   }
 
-  updateArrays(): void {
-    this.filterNewIssues();
-    this.filterApprovedIssues();
-    this.filterInProgIssues();
-    this.filterDoneIssues();
-  }
-
-  filterNewIssues(): void {
-    this.newIssues = this.issues.filter(
-      (issue) => issue.status === ItemStatus.New
-    );
-  }
-  filterInProgIssues(): void {
-    this.inProgIssues = this.issues.filter(
-      (issue) => issue.status === ItemStatus.InProgress
-    );
-  }
-  filterDoneIssues(): void {
-    this.doneIssues = this.issues.filter(
-      (issue) => issue.status === ItemStatus.Done
-    );
-  }
-
-  filterApprovedIssues(): void {
-    this.approvedIssues = this.issues.filter(
-      (issue) => issue.status === ItemStatus.Approved
-    );
+  sortIssues(): void {
+    // Sorting the arrays alphabetically based on the issue title
+    if (this.sortOption === 'alphabeticallyaz') {
+      this.newListComponent.sortIssuesAZ();
+      this.approvedListComponent.sortIssuesAZ();
+      this.inProgListComponent.sortIssuesAZ();
+      this.doneListComponent.sortIssuesAZ();
+    }
+    if (this.sortOption === 'alphabeticallyza') {
+      this.newListComponent.sortIssuesZA();
+      this.approvedListComponent.sortIssuesZA();
+      this.inProgListComponent.sortIssuesZA();
+      this.doneListComponent.sortIssuesZA();
+    }
   }
 }

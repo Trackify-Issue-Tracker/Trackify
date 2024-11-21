@@ -1,23 +1,29 @@
 <div
   (mouseover)="!showIssueForm && (showButton = true)"
   (mouseleave)="!showIssueForm && (showButton = false)"
-  class="col-span-1 bg-main-3 rounded-md p-2 h-[100vh]"
+  class="col-span-1 bg-background-2 rounded-2xl p-2 h-[50vh] overflow-hidden border border-blues-2"
   cdkDropList
   [id]="listId"
   [cdkDropListConnectedTo]="connectedLists"
   (cdkDropListDropped)="drop($event)"
   [cdkDropListData]="getFilteredIssues()"
 >
-  <p class="text-main-4 pl-3 pt-3 border-b border-main-3">{{ listTitle }}</p>
-  <div class="overflow-y-auto max-h-96">
+  <div class="flex">
+    <p class="text-main-4 pl-3 pt-3">
+      {{ listTitle }}
+    </p>
+    <p class="text-main-4 pl-3 pt-3">{{ getFilteredIssues().length }}</p>
+  </div>
+  <div class="overflow-y-auto h-full pb-20">
     <div
       *ngFor="let issue of getFilteredIssues()"
       cdkDrag
       [cdkDragData]="issue"
-      class="bg-white rounded-md m-2"
+      class="bg-white rounded-2xl m-2 hover:bg-blues-5 transition-colors duration-300 hover:border hover:border-blues-2 drop-shadow-md"
     >
       <div class="justify-between flex">
         <p class="pl-2 pt-2">{{ issue.title }}</p>
+
         <button (click)="deleteIssue(issue.id ?? '')">
           <svg
             clip-rule="evenodd"
@@ -40,19 +46,44 @@
 
       <p class="pl-2">{{ issue.description }}</p>
       <div class="flex gap-x-2 pl-2">
-        <p class="rounded-md p-1.5 bg-blue-300">{{ issue.type }}</p>
         <p
-          class="rounded-md p-1.5"
+          *ngIf="issue.priority"
+          class="rounded-md p-1.5 bg-opacity-50"
           [ngClass]="{
-            'bg-priority-1': issue.priority === 'Low',
-            'bg-priority-2': issue.priority === 'Medium',
-            'bg-priority-3': issue.priority === 'High',
-            'bg-priority-4': issue.priority === 'Critical'
+            'bg-priority-1 text-priority-5': issue.priority === 'Low',
+            'bg-priority-2 text-priority-6': issue.priority === 'Medium',
+            'bg-priority-3 text-priority-7': issue.priority === 'High',
+            'bg-priority-4 text-priority-8': issue.priority === 'Critical'
           }"
         >
           {{ issue.priority }}
         </p>
-        <p>{{ issue.labels }}</p>
+
+        <p
+          *ngIf="issue.type"
+          class="rounded-md p-1.5 bg-opacity-50"
+          [ngClass]="{
+            'bg-type-1 text-type-5': issue.type === 'Bug',
+            'bg-type-2 text-type-6': issue.type === 'Task',
+            'bg-type-3 text-type-7': issue.type === 'Improvement',
+            'bg-type-4 text-type-8': issue.type === 'Feature',
+            'bg-blues-2 text-blues-4': issue.type === 'Other'
+          }"
+        >
+          {{ issue.type }}
+        </p>
+
+        <div
+          *ngIf="issue.labels && issue.labels.length > 0"
+          class="flex gap-x-1"
+        >
+          <p
+            *ngFor="let label of issue.labels"
+            class="bg-opacity-50 bg-[#977097] text-[#4D384D] rounded-md p-1.5"
+          >
+            {{ label }}
+          </p>
+        </div>
       </div>
     </div>
     <div
@@ -84,7 +115,6 @@
     <div *ngIf="showIssueForm && currentForm === listTitle" class="relative">
       <div
         class="flex-col p-4 bg-main-1 border-gray-300 rounded-lg shadow-md m-2"
-        (click)="$event.stopPropagation()"
       >
         <div class="justify-between flex">
           <div class="text-main-2 flex items-center">
@@ -192,7 +222,7 @@
           </svg>
           <!-- Input for Project Description -->
           <input
-            [(ngModel)]="issueLabels"
+            [(ngModel)]="inputLabels"
             type="text"
             placeholder="Add Labels"
             class="pl-2 rounded-lg bg-main-1 h-10 placeholder:text-main-2"

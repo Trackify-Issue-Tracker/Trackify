@@ -1,70 +1,117 @@
-<div class="flex w-full transition-all duration-500 overflow-hidden">
+<div
+  class="flex w-full transition-all duration-500 overflow-hidden bg-background-1"
+>
   <hoverbar />
 
   <div class="flex-col w-screen h-screen">
     <div>
       <infobar title="{{ project?.name }}" />
     </div>
-    <h1 class="text-l text-main-4 p-4">Projects / {{ project?.name }}</h1>
-    <div class="flex">
-      <div class="flex-col w-full p-4">
-        <p>Description: {{ project?.description }}</p>
-      </div>
+    <div class="">
+      <h3 class="text-l text-main-4 p-4">Projects / {{ project?.name }}</h3>
+      <div class="flex justify-between">
+        <div class="flex-col w-1/2 p-4">
+          <p>Description: {{ project?.description }}</p>
+        </div>
+        <div class="justify-around flex">
+          <div class="bg-main-3 rounded-lg w-[10rem] h-[6rem] m-4">
+            Total Issues
+          </div>
+          <div class="bg-main-3 rounded-lg w-[10rem] h-[6rem] m-4">
+            High priority
+          </div>
+          <div
+            class="bg-main-3 rounded-lg w-[10rem] h-[6rem] m-4 flex justify-center items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="36"
+              height="36"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M6 14h6v-6c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6zm16 0c0 5.523-4.478 10-10 10s-10-4.477-10-10 4.478-10 10-10 10 4.477 10 10zm-2 0c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8 8-3.589 8-8zm-6-11.819v-2.181h-4v2.181c1.408-.238 2.562-.243 4 0zm6.679 3.554l1.321-1.321-1.414-1.414-1.407 1.407c.536.402 1.038.844 1.5 1.328z"
+              />
+            </svg>
+            <div class="flex-col mb-[-1rem]">
+              <div class="flex justify-center items-center mb-[-1rem]">
+                <h1>1</h1>
+              </div>
 
-      <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
-      <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
-      <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
-      <div class="bg-main-3 rounded-lg w-[12rem] h-[7rem] m-4"></div>
+              <div class="flex justify-center items-center"><p>OVERDUE</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Search Bar -->
-    <div class="w-full h-10 p-3">
+    <div class="w-full h-10 p-4 pb-10 flex justify-between">
       <div>
         <input
           type="text"
-          class="w-40rem p-2 border rounded-md"
+          class="w-[30rem] p-2 border rounded-2xl"
           placeholder="Search issues..."
           [(ngModel)]="searchQuery"
         />
+      </div>
+      <div>
+        <select
+          [(ngModel)]="sortOption"
+          (change)="sortIssues()"
+          class="border rounded-2xl h-10 p-2 w-[10rem]"
+        >
+          <option value="" selected disabled>Sort by</option>
+          <option value="alphabeticallyaz">Alphabetically A-Z</option>
+          <option value="alphabeticallyza">Alphabetically Z-A</option>
+        </select>
       </div>
     </div>
 
     <!-- Issue Lists -->
     <div
-      class="grid grid-cols-4 grid-rows-[repeat(auto-fill,minmax(50px,1fr))] justify-between p-3 gap-x-2"
+      class="grid grid-cols-4 grid-rows-[repeat(auto-fill,minmax(50px,1fr))] justify-between p-4 gap-x-2"
     >
       <!-- NEW List -->
 
       <app-issue-list
+        #newListComponent
         [listId]="'newList'"
         [filteredIssuesKey]="'filteredNewIssues'"
         [listTitle]="'NEW'"
-        [connectedLists]="['newList', 'approvedList', 'inProgList', 'doneList']"
+        [connectedLists]="connectedLists"
         [searchQuery]="searchQuery"
+        (refreshAllLists)="onRefreshAllLists()"
       ></app-issue-list>
 
       <app-issue-list
+        #approvedListComponent
         [listId]="'approvedList'"
         [filteredIssuesKey]="'filteredApprovedIssues'"
         [listTitle]="'APPROVED'"
-        [connectedLists]="['newList', 'approvedList', 'inProgList', 'doneList']"
+        [connectedLists]="connectedLists"
         [searchQuery]="searchQuery"
+        (refreshAllLists)="onRefreshAllLists()"
       ></app-issue-list>
 
       <app-issue-list
+        #inProgListComponent
         [listId]="'inProgList'"
         [filteredIssuesKey]="'filteredInProgIssues'"
         [listTitle]="'IN PROGRESS'"
-        [connectedLists]="['newList', 'approvedList', 'inProgList', 'doneList']"
+        [connectedLists]="connectedLists"
         [searchQuery]="searchQuery"
+        (refreshAllLists)="onRefreshAllLists()"
       ></app-issue-list>
 
       <app-issue-list
+        #doneListComponent
         [listId]="'doneList'"
         [filteredIssuesKey]="'filteredDoneIssues'"
         [listTitle]="'DONE'"
-        [connectedLists]="['newList, approvedList, inProgList, doneList']"
+        [connectedLists]="connectedLists"
         [searchQuery]="searchQuery"
+        (refreshAllLists)="onRefreshAllLists()"
       ></app-issue-list>
 
       <!-- IN PROGRESS List -->
