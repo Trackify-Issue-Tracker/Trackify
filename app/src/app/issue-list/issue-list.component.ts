@@ -192,6 +192,7 @@ export class IssueListComponent {
       this.issuePriority = ItemPriority.Unknown;
       this.issueType = ItemType.Unknown;
       this.issueStatus = ItemStatus.New;
+      this.refreshAllLists.emit();
     });
   }
 
@@ -217,6 +218,7 @@ export class IssueListComponent {
   deleteIssue(issueId: string) {
     this.apiService.deleteIssue(issueId).subscribe(() => {
       this.getIssues();
+      this.refreshAllLists.emit();
     });
   }
 

@@ -52,6 +52,7 @@ export class ProjectDetailsComponent {
   public ItemPriority = ItemPriority;
   public projectId: string | null = null;
   project: Project | null = null;
+  HighPriorityIssues: number = 0;
 
   searchQuery: string = '';
   sortOption: string = '';
@@ -74,6 +75,8 @@ export class ProjectDetailsComponent {
       if (this.projectId) {
         // Now that we have the project ID, fetch the project from the API
         this.getProject(this.projectId);
+        this.getIssues();
+        this.countIssues();
       }
     });
   }
@@ -95,9 +98,9 @@ export class ProjectDetailsComponent {
       const childComponent = this.getChildComponentById(listId);
       if (childComponent) {
         childComponent.getIssues(); // Trigger refresh on the child component
-        console.log(childComponent.issues);
       }
     });
+    this.countIssues();
   }
 
   // Map listId to corresponding child component
@@ -129,6 +132,39 @@ export class ProjectDetailsComponent {
       this.approvedListComponent.sortIssuesZA();
       this.inProgListComponent.sortIssuesZA();
       this.doneListComponent.sortIssuesZA();
+    }
+  }
+
+  getIssues(): void {
+    // This is one way of using the API
+    // See getProjects for the other way
+    // this.apiService.getAllIssues().subscribe((issues: Issue[]) => {
+    //   this.issues = issues;
+    // });
+
+    this.apiService.getAllIssuesOfProject(this.projectId ?? '').subscribe({
+      // completeHandler
+      complete: () => {},
+      // errorHandler
+      error: (error) => {
+        console.error(error);
+      },
+      // nextHandler
+      next: (issues: Issue[]) => {
+        this.issues = issues; // Update the issues array
+        console.log('Issues: ', this.issues);
+      },
+    });
+  }
+
+  countIssues(): void {
+    this.HighPriorityIssues = 0; // Reset the count before recalculating
+    this.getIssues();
+    // Loop through each issue and count those with 'high' status
+    for (let issue of this.issues) {
+      if (issue.priority === 'High' || issue.priority === 'Critical') {
+        this.HighPriorityIssues++;
+      }
     }
   }
 }

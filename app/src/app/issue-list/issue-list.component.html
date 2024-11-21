@@ -135,7 +135,7 @@
               ></path>
             </svg>
 
-            <!-- Input for Project Name -->
+            <!-- Input for Issue Name -->
             <input
               [(ngModel)]="issueTitle"
               type="text"
@@ -264,6 +264,32 @@
             <option value="Improvement">Improvement</option>
             <option value="Feature">Feature</option>
             <option value="Other">Other</option>
+          </select>
+
+          <select id="month">
+            <option value="0">January</option>
+            <option value="1">February</option>
+            <option value="2">March</option>
+            <option value="3">April</option>
+            <option value="4">May</option>
+            <option value="5">June</option>
+            <option value="6">July</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">October</option>
+            <option value="10">November</option>
+            <option value="11">December</option>
+          </select>
+
+          <select id="day">
+            <!-- Days will be populated dynamically based on the selected month -->
+          </select>
+
+          <select id="year">
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <!-- Add more years as needed -->
           </select>
         </div>
       </div>

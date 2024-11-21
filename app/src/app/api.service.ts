@@ -40,9 +40,9 @@ export interface Project {
   description?: string;
   status: ItemStatus;
   priority?: ItemPriority;
-  date_created?: string;
-  date_started?: string;
-  date_closed?: string;
+  date_created?: Date;
+  date_started?: Date;
+  date_closed?: Date;
   labels?: Array<string>;
 }
 
@@ -54,10 +54,10 @@ export interface Issue {
   type: ItemType;
   status: ItemStatus;
   priority?: ItemPriority;
-  date_created?: string;
-  date_started?: string; // when was this issue changed to in progress
-  date_due?: string;
-  date_closed?: string;
+  date_created?: Date;
+  date_started?: Date; // when was this issue changed to in progress
+  date_due?: Date;
+  date_closed?: Date;
   labels?: Array<string>;
 }
 
