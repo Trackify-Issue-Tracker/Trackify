@@ -32,7 +32,7 @@
                 [(ngModel)]="projectName"
                 type="text"
                 placeholder="Project Name"
-                class="p-2 border border-gray-300 rounded-lg h-10"
+                class="p-4 border border-gray-300 rounded-lg h-10"
               />
 
               <!-- Input for Project Description -->
@@ -44,12 +44,12 @@
               />
 
               <!-- Button to Create Project -->
-              <div class="h-10">
+              <div class="flex items-center justify-center">
                 <button
                   (click)="createProject()"
-                  class="p-2 bg-blues-3 text-white rounded-lg flex items-center space-x-2"
+                  class="h-10 bg-blues-2 text-white rounded-lg space-x-2"
                 >
-                  <h1>Create Project</h1>
+                  <h1 class="mt-[-5rem]">Create Project</h1>
                 </button>
               </div>
             </div>
