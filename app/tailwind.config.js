@@ -8,8 +8,7 @@ module.exports = {
       },
       colors: {
         background: {
-          1: "#FAFAFA",
-          2: "#ECECEC",
+          1: "#F5F5F5",
         },
 
         main: {
@@ -19,11 +18,8 @@ module.exports = {
           4: "#6e6e6e",
         },
         blues: {
-          1: "#E7EEF9",
-          2: "#5788d6",
-          3: "#6F99DC",
-          4: "#224A8A",
-          5: "#CFDDF3",
+          1: "#6F99DC",
+          2: "#E7EEF8",
         },
         priority: {
           1: "#B7EF6C",

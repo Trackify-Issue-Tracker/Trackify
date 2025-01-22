@@ -11,6 +11,11 @@ import { CommonModule } from '@angular/common';
 export class HoverNavBarComponent {
   navigation = [
     {
+      id: 'logo',
+      title: 'Trackify',
+      url: '#Dashboard',
+    },
+    {
       id: 'dashboard',
       title: 'Dashboard',
       url: '#Dashboard',
@@ -27,7 +32,7 @@ export class HoverNavBarComponent {
       ],
     },
     {
-      id: '2',
+      id: 'calendar',
       title: 'Calendar',
       url: '#Calendar',
       svgPaths: [

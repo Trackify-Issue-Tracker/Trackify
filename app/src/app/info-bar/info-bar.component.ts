@@ -8,5 +8,5 @@ import { Component, Input } from '@angular/core';
   styleUrl: './info-bar.component.css',
 })
 export class InfoBarComponent {
-  @Input() title: string = 'Project Manager';
+  @Input() title: string = '';
 }
