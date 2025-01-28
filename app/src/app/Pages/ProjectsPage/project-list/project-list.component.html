@@ -1,0 +1,151 @@
+<div class="flex w-full h-[calc(100%-4.5rem)] overflow-y-scroll">
+  <div class="relative w-[70vw] rounded-xl z-10">
+    <!-- Projects Section -->
+    <div
+      class="grid grid-cols-1 grid-rows-[repeat(auto-fill,minmax(50px,1fr))]"
+    >
+      <!-- Search Bar / Create Project Section-->
+      <div class="col-span-1 row-span-1 flex justify-between">
+        <div class="flex items-center justify-center">
+          <input
+            [(ngModel)]="searchQuery"
+            type="text"
+            placeholder="Search projects..."
+            class="w-[45rem] rounded-xl p-2 bg-blues-3"
+          />
+        </div>
+
+        <div class="flex items-center justify-center">
+          <button
+            (click)="toggleInputs()"
+            class="h-10 bg-blues-1 text-blues-2 rounded-lg p-2 px-8"
+          >
+            <h1 class="">Create Project</h1>
+          </button>
+        </div>
+      </div>
+
+      <!-- Links / Options-->
+      <div class="col-span-1 row-span-1 grid grid-cols-7 py-6">
+        <div
+          *ngFor="let tab of tabs; let i = index"
+          (click)="selectTab(i)"
+          class="flex items-center justify-center border-b-2 col-span-1 transition-all duration-300 cursor-pointer"
+          [ngClass]="{
+            'border-blues-1 text-blues-1': selectedTab === i,
+            'border-main-1 text-main-1': selectedTab !== i
+          }"
+        >
+          {{ tab }}
+        </div>
+        <div class="col-span-3 border-main-1 border-b-2"></div>
+
+        <div
+          class="justify-end border-b-2 col-span-1 flex border-main-1 text-main-1 hover:text-blues-1 transition-all duration-300 cursor-pointer"
+        >
+          <svg
+            clip-rule="evenodd"
+            fill-rule="evenodd"
+            stroke-linejoin="round"
+            stroke-miterlimit="2"
+            viewBox="0 0 24 24"
+            height="32px"
+            width="32px"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m16.5 11.995c0-1.242 1.008-2.25 2.25-2.25s2.25 1.008 2.25 2.25-1.008 2.25-2.25 2.25-2.25-1.008-2.25-2.25zm-6.75 0c0-1.242 1.008-2.25 2.25-2.25s2.25 1.008 2.25 2.25-1.008 2.25-2.25 2.25-2.25-1.008-2.25-2.25zm-6.75 0c0-1.242 1.008-2.25 2.25-2.25s2.25 1.008 2.25 2.25-1.008 2.25-2.25 2.25-2.25-1.008-2.25-2.25z"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Project Details/Sorting   -->
+      <div class="col-span-1 row-span-1">
+        <project-sorting-details></project-sorting-details>
+      </div>
+
+      <!-- Filtered Projects -->
+      <div
+        *ngFor="let project of filteredProjects; let i = index"
+        (click)="onProjectClick(project)"
+        class="col-span-1 row-span-1 grid grid-cols-8 grid-rows-2 p-2 overflow-hidden bg-white border-b border-blue-1 hover:bg-main-1 transition-all duration-300 overflow-auto"
+      >
+        <div
+          class="row-span-2 col-span-1 p-4 border-r-2 border-main-3 flex items-center justify-center"
+        >
+          <div
+            class="border border-blues-1 w-[2.5rem] h-[2.5rem] rounded-md flex items-center justify-center"
+          >
+            <h1 class="text-blues-3">0{{ project.id }}</h1>
+          </div>
+        </div>
+        <div class="row-span-2 col-span-1">
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1 class="text-main-3">Name</h1>
+          </div>
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1 class="text-main-2">{{ project.name }}</h1>
+          </div>
+        </div>
+        <!-- <div class="row-span-2 col-span-1 border-r-2 border-l-2">
+            <div class="col-span-1 row-span-1 justify-center flex">
+              <h1 class="text-main-3">Description</h1>
+            </div>
+            <div class="col-span-1 row-span-1 justify-center flex">
+              <h1 class="text-main-2">
+                {{ project.description }}
+              </h1>
+            </div> -->
+        <!-- </div> -->
+        <div class="row-span-2 col-span-1">
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1 class="text-main-3">Status</h1>
+          </div>
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1
+              [ngClass]="{
+                'text-green-500': project.status === ItemStatus.Done,
+                'text-red-500': project.status === ItemStatus.Closed,
+                'text-blue-500': project.status === ItemStatus.New,
+                'text-yellow-500': project.status === ItemStatus.Approved,
+                'text-orange-500': project.status === ItemStatus.InProgress
+              }"
+            >
+              {{ project.status }}
+            </h1>
+          </div>
+        </div>
+        <div class="row-span-2 col-span-1">
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1 class="text-main-3">Priority</h1>
+          </div>
+          <div class="col-span-1 row-span-1 justify-center flex">
+            <h1
+              [ngClass]="{
+                  'text-green-500': project.priority === ItemPriority.Low,
+                  'text-red-500': project.priority === ItemPriority.Medium,
+                  'text-blue-500': project.priority === ItemPriority.High,
+                  'text-yellow-500': project.priority === ItemPriority.Critical,
+                }"
+            >
+              {{ project.priority }}
+            </h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    *ngIf="showInputs"
+    class="w-[20rem] transition-all duration-500 ease-in-out transform ml-4 rounded-xl overflow-hidden border border-main-3 drop-shadow-lg hover:bg-main-1"
+    [ngClass]="{
+      'translate-x-0': !translateAfterDelay,
+      'translate-x-[30rem]': translateAfterDelay
+    }"
+    (click)="navigateToProject(selectedProject?.id)"
+  >
+    <create-project></create-project>
+  </div>
+</div>
