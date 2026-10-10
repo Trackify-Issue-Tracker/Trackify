@@ -1,0 +1,21 @@
+.sub { margin-top: 6px; font-size: 14px; }
+.overdue { color: var(--danger); font-weight: 500; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+.card { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 18px; min-height: 210px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; transition: border-color .12s, transform .12s; }
+.card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+.cover { position: absolute; inset: 0; border-radius: 12px; }
+.top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.actions { position: relative; display: flex; opacity: 0; transition: opacity .1s; }
+.card:hover .actions, .actions:focus-within { opacity: 1; }
+h3 { margin: 0; font: 500 20px/1.25 var(--serif); letter-spacing: -.01em; }
+.desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+.bar { display: flex; gap: 2px; height: 6px; border-radius: 3px; overflow: hidden; background: var(--border); margin-top: 10px; }
+.seg { background: var(--s-new); }
+.seg.s-approved { background: var(--s-approved); }
+.seg.s-in-progress { background: var(--s-in-progress); }
+.seg.s-done { background: var(--s-done); }
+.seg.s-closed { background: var(--s-closed); }
+.foot { display: flex; align-items: center; gap: 14px; font-size: 12.5px; margin-top: 4px; }
+.foot .prio { margin-left: auto; }
+.new { align-items: center; justify-content: center; flex-direction: row; gap: 8px; background: transparent; border: 1.5px dashed var(--border-strong); color: var(--muted); font: 500 13px Inter, sans-serif; cursor: pointer; }
+.new:hover { color: var(--text); border-color: var(--muted); transform: none; }

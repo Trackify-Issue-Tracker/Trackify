@@ -1,6 +1,49 @@
-<div>
-  <button (click)="deleteAll()">Reset</button>
-  <button (click)="createProject()">Create Project</button>
-  <button (click)="createIssue()">Create Issue</button>
-  <button (click)="updateProject()">Update Project</button>
+<div class="shell">
+  <aside class="side">
+    <a class="brand" routerLink="/dashboard"><span class="logo"><app-icon name="logo" /></span> Trackify</a>
+
+    <nav class="nav">
+      @for (link of links; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"><app-icon [name]="link.icon" /> {{ link.label }}</a>
+      }
+    </nav>
+
+    <div class="group">
+      <h2>Projects</h2>
+      <nav class="nav">
+        @for (project of store.projects(); track project.id) {
+          <a [routerLink]="['/projects', project.id]" routerLinkActive="active">
+            <span class="avatar" [style.--hue]="hue(project.name)">{{ initial(project.name) }}</span><span class="name">{{ project.name }}</span>
+          </a>
+        } @empty {
+          <span class="none">No projects yet</span>
+        }
+      </nav>
+    </div>
+
+    <div class="foot">
+      <div class="theme" role="radiogroup" aria-label="Theme">
+        @for (item of themes; track item.mode) {
+          <button role="radio" [attr.aria-checked]="theme.mode() === item.mode" [class.on]="theme.mode() === item.mode"
+                  [title]="item.label" [attr.aria-label]="item.label + ' theme'" (click)="theme.set(item.mode)">
+            <app-icon [name]="item.icon" />
+          </button>
+        }
+      </div>
+      <button class="reset" (click)="deleteAll()">Reset all data</button>
+    </div>
+  </aside>
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<div class="toasts">
+  @for (item of toast.toasts(); track item.id) {
+    <div class="toast" [class.error]="item.kind === 'error'">
+      {{ item.text }}
+      <button class="icon-btn" aria-label="Dismiss" (click)="toast.dismiss(item.id)"><app-icon name="x" /></button>
+    </div>
+  }
 </div>

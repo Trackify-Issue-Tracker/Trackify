@@ -43,7 +43,7 @@ export interface Project {
     date_created?: string;
     date_started?: string;
     date_closed?: string;
-    labels?: Array<string>;
+    labels?: string; // comma separated, the database column is a VARCHAR
 }
 
 export interface Issue {
@@ -58,7 +58,7 @@ export interface Issue {
     date_started?: string; // when was this issue changed to in progress
     date_due?: string;
     date_closed?: string;
-    labels?: Array<string>;
+    labels?: string; // comma separated, the database column is a VARCHAR
 }
 
 interface JsonResponse {
@@ -66,12 +66,22 @@ interface JsonResponse {
     message: any;
 }
 
+// The API returns numeric ids, the rest of the app treats ids as strings
+function normalizeProject(project: Project): Project {
+    return project ? { ...project, id: String(project.id) } : project;
+}
+
+function normalizeIssue(issue: Issue): Issue {
+    return issue ? { ...issue, id: String(issue.id), project_id: String(issue.project_id) } : issue;
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class ApiService {
 
-    private apiUrl = 'http://localhost:5000/api';
+    // Relative so it goes through the nginx proxy (or the dev server proxy, see proxy.conf.json)
+    private apiUrl = '/api';
 
     constructor(private http: HttpClient) {
         // Check if we are running in a container
@@ -104,7 +114,7 @@ export class ApiService {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, get data from the API
             return this.http.get<JsonResponse>(`${this.apiUrl}/projects`).pipe(
-                map((response: JsonResponse) => response.message)
+                map((response: JsonResponse) => (response.message as Project[]).map(normalizeProject))
             );
         }
         // If we are not running in a container, get data from local storage
@@ -123,6 +133,7 @@ export class ApiService {
         const items: Project[] = this.getLocalStorageProjects();
         const maxId = items.length > 0 ? Math.max(...items.map(item => Number(item.id))) : 0;
         project.id = (maxId + 1).toString();
+        project.date_created = new Date().toISOString();
         items.push(project);
         localStorage.setItem('projects', JSON.stringify(items));
 
@@ -136,7 +147,7 @@ export class ApiService {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, get data from the API
             return this.http.get<JsonResponse>(`${this.apiUrl}/projects/${project_id}`).pipe(
-                map((response: JsonResponse) => response.message)
+                map((response: JsonResponse) => normalizeProject(response.message))
             );
         }
         // If we are not running in a container, get data from local storage
@@ -154,7 +165,7 @@ export class ApiService {
         });
     }
 
-    updateProject(project_id: string, value: Project): Observable<object> {
+    updateProject(project_id: string, value: Partial<Project>): Observable<object> {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, put data to the API
             return this.http.put(`${this.apiUrl}/projects/${project_id}`, value);
@@ -203,7 +214,7 @@ export class ApiService {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, get data from the API
             return this.http.get<JsonResponse>(`${this.apiUrl}/projects/${project_id}/issues`).pipe(
-                map((response: JsonResponse) => response.message)
+                map((response: JsonResponse) => (response.message as Issue[]).map(normalizeIssue))
             );
         }
         // If we are not running in a container, get data from local storage
@@ -233,6 +244,7 @@ export class ApiService {
             const items: Issue[] = this.getLocalStorageIssues();
             const maxId = items.length > 0 ? Math.max(...items.map(item => Number(item.id))) : 0;
             issue.id = (maxId + 1).toString();
+            issue.date_created = new Date().toISOString();
             items.push(issue);
             localStorage.setItem('issues', JSON.stringify(items));
         }
@@ -246,7 +258,7 @@ export class ApiService {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, get data from the API
             return this.http.get<JsonResponse>(`${this.apiUrl}/issues/${issue_id}`).pipe(
-                map((response: JsonResponse) => response.message)
+                map((response: JsonResponse) => normalizeIssue(response.message))
             );
         }
         // If we are not running in a container, get data from local storage
@@ -264,7 +276,7 @@ export class ApiService {
         });
     }
 
-    updateIssue(issue_id: string, value: Issue): Observable<object> {
+    updateIssue(issue_id: string, value: Partial<Issue>): Observable<object> {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, put data to the API
             return this.http.put(`${this.apiUrl}/issues/${issue_id}`, value);
@@ -276,6 +288,7 @@ export class ApiService {
             const current = items[index];
             // Update only the fields that were provided
             current.title = value.title ?? current.title;
+            current.type = value.type ?? current.type;
             current.description = value.description ?? current.description;
             current.status = value.status ?? current.status;
             current.priority = value.priority ?? current.priority;
@@ -285,7 +298,7 @@ export class ApiService {
             current.project_id = value.project_id ?? current.project_id;
             current.labels = value.labels ?? current.labels;
 
-            items[index] = value;
+            items[index] = current;
             localStorage.setItem('issues', JSON.stringify(items));
         }
         return new Observable(observer => {
@@ -316,7 +329,7 @@ export class ApiService {
         if (IS_CONTAINERIZED) {
             // If we are running in a container, get data from the API
             return this.http.get<JsonResponse>(`${this.apiUrl}/issues`).pipe(
-                map((response: JsonResponse) => response.message)
+                map((response: JsonResponse) => (response.message as Issue[]).map(normalizeIssue))
             );
         }
         // If we are not running in a container, get data from local storage

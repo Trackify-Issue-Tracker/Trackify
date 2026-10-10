@@ -1,0 +1,13 @@
+// Material is only used for the issues table (and its sort headers), everything else is custom, see styles.css
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$theme: mat.define-light-theme((
+  color: (primary: mat.define-palette(mat.$indigo-palette), accent: mat.define-palette(mat.$grey-palette)),
+  typography: mat.define-typography-config($font-family: 'Inter, system-ui, sans-serif'),
+  density: -2,
+));
+
+@include mat.table-theme($theme);
+@include mat.sort-theme($theme);
