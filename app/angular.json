@@ -25,6 +25,7 @@
               "src/assets"
             ],
             "styles": [
+              "src/theme.scss",
               "src/styles.css"
             ],
             "scripts": []
@@ -39,8 +40,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ],
               "outputHashing": "all"
@@ -63,7 +64,10 @@
               "buildTarget": "app:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
@@ -84,6 +88,7 @@
               "src/assets"
             ],
             "styles": [
+              "src/theme.scss",
               "src/styles.css"
             ],
             "scripts": []

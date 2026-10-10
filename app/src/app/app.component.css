@@ -1,0 +1,30 @@
+.shell { display: grid; grid-template-columns: 224px 1fr; min-height: 100vh; }
+.side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 20px; padding: 16px 12px; border-right: 1px solid var(--border); background: var(--bg); overflow-y: auto; }
+.brand { display: flex; align-items: center; gap: 9px; padding: 0 8px; font: 500 19px/1 var(--serif); letter-spacing: -.01em; }
+.logo { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: var(--accent); color: #fff; font-size: 14px; }
+.nav { display: flex; flex-direction: column; gap: 1px; }
+.nav a { display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 8px; border-radius: 6px; color: var(--muted); font-weight: 500; }
+.nav a:hover { background: var(--sunken); color: var(--text); }
+.nav a.active { background: var(--sunken); color: var(--text); box-shadow: inset 2px 0 0 var(--accent); }
+.nav .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav .avatar { width: 18px; height: 18px; border-radius: 5px; font-size: 10px; margin: 0 2px; }
+.group { display: flex; flex-direction: column; gap: 6px; }
+.group h2 { padding: 0 8px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.none { padding: 0 8px; color: var(--muted); font-size: 12px; }
+.foot { margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.theme { display: inline-flex; padding: 2px; gap: 2px; border: 1px solid var(--border); border-radius: 8px; background: var(--sunken); }
+.theme button { display: grid; place-items: center; width: 28px; height: 24px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--muted); font-size: 14px; cursor: pointer; }
+.theme button:hover { color: var(--text); }
+.theme button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0, 0, 0, .15); }
+.reset { padding: 4px 8px; margin-left: -8px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; border-radius: 5px; }
+.reset:hover { color: var(--danger); background: var(--sunken); }
+main { min-width: 0; padding: 28px 32px 48px; }
+
+@media (max-width: 800px) {
+  .shell { grid-template-columns: 1fr; }
+  .side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .group, .reset { display: none; }
+  .foot { margin: 0 0 0 auto; }
+  .nav { flex-direction: row; }
+  main { padding: 20px 14px 40px; }
+}

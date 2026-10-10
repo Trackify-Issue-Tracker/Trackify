@@ -1,0 +1,76 @@
+<div class="page-head">
+  <h1>Issues</h1>
+  <button class="btn primary" [disabled]="!projects.length" (click)="openIssue()"><app-icon name="plus" /> New issue</button>
+</div>
+
+<div class="toolbar">
+  <label class="search">
+    <app-icon name="search" />
+    <input [(ngModel)]="search" (ngModelChange)="applyFilters()" placeholder="Search issues" aria-label="Search issues">
+  </label>
+  <select [(ngModel)]="projectFilter" (ngModelChange)="applyFilters()" aria-label="Filter by project">
+    <option value="">All projects</option>
+    @for (project of projects; track project.id) { <option [value]="project.id">{{ project.name }}</option> }
+  </select>
+  <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" aria-label="Filter by status">
+    <option value="">All statuses</option>
+    @for (status of statuses; track status) { <option [value]="status">{{ status }}</option> }
+  </select>
+  <select [(ngModel)]="priorityFilter" (ngModelChange)="applyFilters()" aria-label="Filter by priority">
+    <option value="">All priorities</option>
+    @for (priority of priorities; track priority) { <option [value]="priority">{{ priority }}</option> }
+  </select>
+  <select [(ngModel)]="typeFilter" (ngModelChange)="applyFilters()" aria-label="Filter by type">
+    <option value="">All types</option>
+    @for (type of types; track type) { <option [value]="type">{{ type }}</option> }
+  </select>
+  <button class="pill" [class.on]="hideClosed" (click)="hideClosed = !hideClosed; applyFilters()">Open only</button>
+  <button class="pill" [class.on]="overdueOnly" (click)="overdueOnly = !overdueOnly; applyFilters()">Overdue</button>
+</div>
+
+@if (loading) {
+  <p class="loading">Loading…</p>
+} @else {
+  <div class="table-wrap">
+    <table mat-table matSort [dataSource]="dataSource" matSortActive="priority" matSortDirection="asc">
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Title</th>
+        <td mat-cell *matCellDef="let issue">
+          <span class="title"><app-icon class="type" [name]="typeIcons[issue.type]" [title]="issue.type" /> {{ issue.title }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="project">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Project</th>
+        <td mat-cell *matCellDef="let issue">
+          <a class="muted link" [routerLink]="['/projects', issue.project_id]" (click)="$event.stopPropagation()">{{ projectName(issue.project_id) }}</a>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let issue"><span class="status"><span class="dot {{ statusClass(issue.status) }}"></span>{{ issue.status }}</span></td>
+      </ng-container>
+      <ng-container matColumnDef="priority">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
+        <td mat-cell *matCellDef="let issue">
+          @if (issue.priority) { <span class="prio p-{{ issue.priority }}"><i></i>{{ issue.priority }}</span> }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="date_due">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Due</th>
+        <td mat-cell *matCellDef="let issue">
+          @if (issue.date_due) { <span class="due" [class.overdue]="isOverdue(issue)">{{ dueLabel(issue) }}</span> }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let issue">
+          <button class="icon-btn danger del" aria-label="Delete issue" (click)="deleteIssue(issue, $event)"><app-icon name="trash" /></button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns" (click)="openIssue(row)"></tr>
+      <tr class="mat-row" *matNoDataRow><td class="empty" [attr.colspan]="columns.length">No issues match</td></tr>
+    </table>
+  </div>
+}

@@ -1,0 +1,12 @@
+table { width: 100%; }
+tr.mat-mdc-row { cursor: pointer; transition: background .1s; }
+tr.mat-mdc-row:hover { background: var(--sunken); }
+.title { display: inline-flex; align-items: center; gap: 8px; }
+.type { color: var(--muted); font-size: 14px; }
+.link:hover { color: var(--text); }
+.del { opacity: 0; }
+tr:hover .del, .del:focus-visible { opacity: 1; }
+.empty { text-align: center; padding: 32px; color: var(--muted); }
+.mat-column-actions { width: 48px; }
+td.mat-mdc-cell { white-space: nowrap; }
+.mat-column-title { min-width: 260px; }

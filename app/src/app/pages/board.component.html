@@ -1,0 +1,79 @@
+@if (loading) {
+  <p class="loading">Loading…</p>
+} @else if (notFound || !project) {
+  <div class="empty-state">
+    <p>That project could not be found.</p>
+    <a class="btn primary" routerLink="/projects">Back to projects</a>
+  </div>
+} @else {
+  <div class="page-head">
+    <div>
+      <a routerLink="/projects" class="crumb"><app-icon name="arrow-left" /> Projects</a>
+      <div class="title-row">
+        <span class="avatar lg" [style.--hue]="hue(project.name)">{{ initial(project.name) }}</span>
+        <h1>{{ project.name }}</h1>
+      </div>
+      @if (project.description) { <p class="muted desc">{{ project.description }}</p> }
+    </div>
+    <button class="btn primary" (click)="openIssue()"><app-icon name="plus" /> New issue</button>
+  </div>
+
+  <div class="toolbar">
+    <label class="search">
+      <app-icon name="search" />
+      <input [(ngModel)]="search" placeholder="Search issues" aria-label="Search issues">
+    </label>
+    <select [(ngModel)]="priorityFilter" aria-label="Filter by priority">
+      <option value="">All priorities</option>
+      @for (priority of priorities; track priority) { <option [value]="priority">{{ priority }}</option> }
+    </select>
+    <select [(ngModel)]="typeFilter" aria-label="Filter by type">
+      <option value="">All types</option>
+      @for (type of types; track type) { <option [value]="type">{{ type }}</option> }
+    </select>
+    <select [(ngModel)]="sort" aria-label="Sort by">
+      <option value="urgency">Sort: priority</option>
+      <option value="due">Sort: due date</option>
+      <option value="created">Sort: newest</option>
+    </select>
+  </div>
+
+  <div class="board" cdkDropListGroup>
+    @for (status of statuses; track status) {
+      <section class="col">
+        <header>
+          <span class="dot {{ statusClass(status) }}"></span>
+          <h3>{{ status }}</h3>
+          <span class="count">{{ column(status).length }}</span>
+          <button class="icon-btn" [attr.aria-label]="'Add issue to ' + status" (click)="startAdd(status)"><app-icon name="plus" /></button>
+        </header>
+
+        <div class="cards" cdkDropList cdkDropListSortingDisabled [cdkDropListData]="status" (cdkDropListDropped)="drop($event)">
+          @for (issue of column(status); track issue.id) {
+            <article class="card" cdkDrag [cdkDragData]="issue" tabindex="0" (click)="openIssue(issue)" (keydown.enter)="openIssue(issue)">
+              <div class="title">
+                <app-icon class="type" [name]="typeIcons[issue.type]" [title]="issue.type" />
+                <span>{{ issue.title }}</span>
+              </div>
+              <div class="meta">
+                @if (issue.priority) { <span class="prio p-{{ issue.priority }}"><i></i>{{ issue.priority }}</span> }
+                @if (issue.date_due) {
+                  <span class="due" [class.overdue]="isOverdue(issue)"><app-icon name="clock" /> {{ dueLabel(issue) }}</span>
+                }
+                @for (label of labelsOf(issue.labels); track label) { <span class="tag">#{{ label }}</span> }
+              </div>
+              <button class="icon-btn danger del" aria-label="Delete issue" (click)="deleteIssue(issue, $event)"><app-icon name="trash" /></button>
+            </article>
+          }
+
+          @if (adding === status) {
+            <input #quick class="quick" placeholder="Issue title, then Enter"
+                   (keydown.enter)="quickAdd(status, quick)" (keydown.escape)="adding = null" (blur)="adding = null">
+          } @else if (!column(status).length) {
+            <button class="add" (click)="startAdd(status)"><app-icon name="plus" /> Add issue</button>
+          }
+        </div>
+      </section>
+    }
+  </div>
+}

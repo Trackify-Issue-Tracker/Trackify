@@ -1,0 +1,96 @@
+@if (loading) {
+  <p class="loading">Loading…</p>
+} @else if (!projects.length) {
+  <div class="empty-state">
+    <h1>Welcome to Trackify</h1>
+    <p>Projects hold your issues. Make your first one to get started.</p>
+    <a class="btn primary" routerLink="/projects"><app-icon name="folder" /> Create a project</a>
+  </div>
+} @else {
+  <header class="hello">
+    <div>
+      <span class="date">{{ today }}</span>
+      <h1>{{ greeting }}.</h1>
+      <p class="summary">{{ summary }}</p>
+    </div>
+    <button class="btn primary" (click)="newIssue()"><app-icon name="plus" /> New issue</button>
+  </header>
+
+  <div class="figures">
+    <a routerLink="/issues" [queryParams]="{ open: true }"><span>Open</span><strong>{{ openIssues.length }}</strong></a>
+    <a routerLink="/issues" [queryParams]="{ overdue: true }" [class.alert]="overdue.length"><span>Overdue</span><strong>{{ overdue.length }}</strong></a>
+    <div><span>Due this week</span><strong>{{ dueThisWeek.length }}</strong></div>
+    <div><span>Finished</span><strong>{{ doneCount }}</strong></div>
+  </div>
+
+  <div class="columns">
+    <section class="panel">
+      <header><h2>Coming up</h2><a class="more" routerLink="/issues" [queryParams]="{ open: true }">All open issues</a></header>
+      @for (group of timeline; track group.label) {
+        <h3 class="group-label" [class.alert]="group.label === 'Overdue'">{{ group.label }} <span>{{ group.issues.length }}</span></h3>
+        <ul>
+          @for (issue of group.issues; track issue.id) {
+            <li>
+              <a class="row" [routerLink]="['/projects', issue.project_id]">
+                <app-icon class="type" [name]="typeIcons[issue.type]" [title]="issue.type" />
+                <span class="name">{{ issue.title }}</span>
+                @if (project(issue.project_id); as owner) {
+                  <span class="owner"><span class="avatar" [style.--hue]="hue(owner.name)">{{ initial(owner.name) }}</span>{{ owner.name }}</span>
+                }
+                @if (issue.priority) { <span class="prio p-{{ issue.priority }}"><i></i>{{ issue.priority }}</span> }
+                @if (issue.date_due) { <span class="due" [class.overdue]="isOverdue(issue)">{{ dueLabel(issue) }}</span> }
+              </a>
+            </li>
+          }
+        </ul>
+      } @empty {
+        <p class="none">Nothing open right now.</p>
+      }
+    </section>
+
+    <aside>
+      <section class="panel">
+        <header><h2>Projects</h2><a class="more" routerLink="/projects">View all</a></header>
+        <ul>
+          @for (item of projects; track item.id) {
+            <li>
+              <a class="row proj" [routerLink]="['/projects', item.id]">
+                <span class="avatar" [style.--hue]="hue(item.name)">{{ initial(item.name) }}</span>
+                <span class="pname">{{ item.name }}</span>
+                <span class="pct">{{ progress(item) }}%</span>
+                <span class="meter"><span [style.width.%]="progress(item)"></span></span>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="panel">
+        <header><h2>Where things stand</h2></header>
+        <div class="pad">
+          <div class="bar">
+            @for (status of statuses; track status) {
+              @if (countByStatus(status)) {
+                <span class="seg {{ statusClass(status) }}" [style.flex-grow]="countByStatus(status)" [title]="status"></span>
+              }
+            }
+          </div>
+          <ul class="legend">
+            @for (status of statuses; track status) {
+              <li><span class="status"><span class="dot {{ statusClass(status) }}"></span>{{ status }}</span><span>{{ countByStatus(status) }}</span></li>
+            }
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <header><h2>Recently added</h2></header>
+        <ul>
+          @for (issue of recent; track issue.id) {
+            <li><a class="row" [routerLink]="['/projects', issue.project_id]"><span class="dot {{ statusClass(issue.status) }}"></span><span class="name">{{ issue.title }}</span></a></li>
+          }
+        </ul>
+      </section>
+    </aside>
+  </div>
+}

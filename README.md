@@ -47,6 +47,24 @@ The Angular app, built using the Angular framework, provides a user-friendly int
 
 - API Service: Responsible for using HTTP methods to work on data in the database through the Python API.
 
+#### Pages
+
+- Dashboard (`/dashboard`): open/overdue counts, issues by status and a "needs attention" list.
+- Projects (`/projects`): create, edit and delete projects, with progress per project.
+- Board (`/projects/:id`): kanban board of a project's issues. Drag cards between status columns, filter and sort by priority or due date.
+- Issues (`/issues`): sortable, filterable table of every issue.
+
+#### Frontend development
+
+```bash
+cd app
+npm install
+npm start
+```
+
+`npm start` serves the app on http://localhost:4200 and proxies `/api` to a backend on `localhost:5001` (see `app/proxy.conf.json`).
+To work without the backend, temporarily set `IS_CONTAINERIZED` to `false` in `app/src/app/is_containerized.ts`, which stores data in the browser's local storage (do not commit this change).
+
 ## Project Setup
 
 

@@ -1,0 +1,52 @@
+<div class="page-head">
+  <div>
+    <h1>Projects</h1>
+    @if (!loading && projects.length) {
+      <p class="muted sub">
+        {{ projects.length }} project{{ projects.length === 1 ? '' : 's' }}, {{ totalOpen }} open issue{{ totalOpen === 1 ? '' : 's' }}@if (totalOverdue) {, <span class="overdue">{{ totalOverdue }} overdue</span>}
+      </p>
+    }
+  </div>
+  <button class="btn primary" (click)="openProject()"><app-icon name="plus" /> New project</button>
+</div>
+
+@if (loading) {
+  <p class="loading">Loading…</p>
+} @else if (!projects.length) {
+  <div class="empty-state">
+    <p>No projects yet. Create one to start tracking issues.</p>
+    <button class="btn primary" (click)="openProject()"><app-icon name="plus" /> New project</button>
+  </div>
+} @else {
+  <div class="grid">
+    @for (project of projects; track project.id) {
+      <article class="card">
+        <a class="cover" [routerLink]="['/projects', project.id]" [attr.aria-label]="'Open ' + project.name"></a>
+        <div class="top">
+          <span class="avatar xl" [style.--hue]="hue(project.name)">{{ initial(project.name) }}</span>
+          <div class="actions">
+            <button class="icon-btn" aria-label="Edit project" (click)="openProject(project)"><app-icon name="pencil" /></button>
+            <button class="icon-btn danger" aria-label="Delete project" (click)="deleteProject(project)"><app-icon name="trash" /></button>
+          </div>
+        </div>
+        <h3>{{ project.name }}</h3>
+        <p class="desc muted">{{ project.description || 'No description' }}</p>
+
+        <div class="bar" [title]="progress(project) + '% done'">
+          @for (status of statuses; track status) {
+            @if (countByStatus(project, status)) {
+              <span class="seg {{ statusClass(status) }}" [style.flex-grow]="countByStatus(project, status)" [title]="status + ': ' + countByStatus(project, status)"></span>
+            }
+          }
+        </div>
+        <div class="foot">
+          <span><strong>{{ openCount(project) }}</strong> open</span>
+          @if (overdueCount(project)) { <span class="overdue"><strong>{{ overdueCount(project) }}</strong> overdue</span> }
+          @else if (nextDue(project)) { <span class="muted">Next due {{ nextDue(project) }}</span> }
+          @if (project.priority) { <span class="prio p-{{ project.priority }}"><i></i>{{ project.priority }}</span> }
+        </div>
+      </article>
+    }
+    <button class="card new" (click)="openProject()"><app-icon name="plus" /> New project</button>
+  </div>
+}
