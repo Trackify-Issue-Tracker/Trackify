@@ -21,17 +21,18 @@
   <div class="toolbar">
     <label class="search">
       <app-icon name="search" />
-      <input [(ngModel)]="search" placeholder="Search issues" aria-label="Search issues">
+      <input [ngModel]="search" (ngModelChange)="search = $event; rebuild()" placeholder="Search issues" aria-label="Search issues">
     </label>
-    <select [(ngModel)]="priorityFilter" aria-label="Filter by priority">
+    <select [ngModel]="priorityFilter" (ngModelChange)="priorityFilter = $event; rebuild()" aria-label="Filter by priority">
       <option value="">All priorities</option>
       @for (priority of priorities; track priority) { <option [value]="priority">{{ priority }}</option> }
     </select>
-    <select [(ngModel)]="typeFilter" aria-label="Filter by type">
+    <select [ngModel]="typeFilter" (ngModelChange)="typeFilter = $event; rebuild()" aria-label="Filter by type">
       <option value="">All types</option>
       @for (type of types; track type) { <option [value]="type">{{ type }}</option> }
     </select>
-    <select [(ngModel)]="sort" aria-label="Sort by">
+    <select [ngModel]="sort" (ngModelChange)="sort = $event; rebuild()" aria-label="Sort by">
+      <option value="manual">Sort: manual</option>
       <option value="urgency">Sort: priority</option>
       <option value="due">Sort: due date</option>
       <option value="created">Sort: newest</option>
@@ -44,13 +45,15 @@
         <header>
           <span class="dot {{ statusClass(status) }}"></span>
           <h3>{{ status }}</h3>
-          <span class="count">{{ column(status).length }}</span>
+          <span class="count">{{ columns[status].length }}</span>
           <button class="icon-btn" [attr.aria-label]="'Add issue to ' + status" (click)="startAdd(status)"><app-icon name="plus" /></button>
         </header>
 
-        <div class="cards" cdkDropList cdkDropListSortingDisabled [cdkDropListData]="status" (cdkDropListDropped)="drop($event)">
-          @for (issue of column(status); track issue.id) {
-            <article class="card" cdkDrag [cdkDragData]="issue" tabindex="0" (click)="openIssue(issue)" (keydown.enter)="openIssue(issue)">
+        <div class="cards" cdkDropList [cdkDropListData]="columns[status]" [cdkDropListSortingDisabled]="sort !== 'manual'"
+             (cdkDropListDropped)="drop($event, status)">
+          @for (issue of columns[status]; track issue.id) {
+            <article class="card" cdkDrag [cdkDragData]="issue" tabindex="0" (cdkDragStarted)="dragStarted()" (cdkDragEnded)="dragEnded()"
+                     (click)="openIssue(issue)" (keydown.enter)="openIssue(issue)">
               <div class="title">
                 <app-icon class="type" [name]="typeIcons[issue.type]" [title]="issue.type" />
                 <span>{{ issue.title }}</span>
@@ -69,7 +72,7 @@
           @if (adding === status) {
             <input #quick class="quick" placeholder="Issue title, then Enter"
                    (keydown.enter)="quickAdd(status, quick)" (keydown.escape)="adding = null" (blur)="adding = null">
-          } @else if (!column(status).length) {
+          } @else {
             <button class="add" (click)="startAdd(status)"><app-icon name="plus" /> Add issue</button>
           }
         </div>

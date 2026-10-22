@@ -1,3 +1,5 @@
+/* The button stays on the title row, so it does not move when the summary line appears under the title */
+.page-head { align-items: flex-start; }
 .sub { margin-top: 6px; font-size: 14px; }
 .overdue { color: var(--danger); font-weight: 500; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
