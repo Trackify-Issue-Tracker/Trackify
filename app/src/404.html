@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Trackify</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    // GitHub Pages serves this file for any path that is not a real file, such as /dashboard or /projects/1 typed
+    // straight into the address bar. The app is a single page app with only one real page (index.html), so send the
+    // visitor to the root with the original path tucked into the query string. index.html puts the real URL back
+    // before Angular starts, so the router then opens the right page.
+    // Based on https://github.com/rafgraph/spa-github-pages (the app is served from the domain root).
+    var l = window.location;
+    l.replace(
+      l.protocol + '//' + l.host + '/?/' +
+      l.pathname.slice(1).replace(/&/g, '~and~') +
+      (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+      l.hash
+    );
+  </script>
+</head>
+<body>
+  <noscript>Trackify needs JavaScript. <a href="/">Open the app</a>.</noscript>
+</body>
+</html>

@@ -10,6 +10,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <script>
+    // Counterpart of 404.html: a deep link like /dashboard arrives here as /?/dashboard (see 404.html).
+    // Put the real URL back before Angular starts so the router opens the right page.
+    (function (l) {
+      if (l.search[1] === '/') {
+        var path = l.search.slice(1).split('&').map(function (part) { return part.replace(/~and~/g, '&'); }).join('?');
+        window.history.replaceState(null, null, l.pathname.slice(0, -1) + path + l.hash);
+      }
+    }(window.location));
+  </script>
+  <script>
     // Apply the saved theme before the first paint to avoid a flash of the wrong one
     try {
       var mode = localStorage.getItem('trackify-theme');
